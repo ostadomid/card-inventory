@@ -1,36 +1,35 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 import { sql } from 'drizzle-orm'
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
-// export const todos = sqliteTable('todos', {
-//   id: integer('id', { mode: 'number' }).primaryKey({
-//     autoIncrement: true,
-//   }),
-//   title: text('title').notNull(),
-//   createdAt: integer('created_at', { mode: 'timestamp' }).default(
-//     sql`(unixepoch())`,
-//   ),
-// })
-
-export const users = sqliteTable('users', {
-  phone: text().primaryKey(),
-  firstName: text('first_name'),
-  lastName: text('last_name'),
-  password: text(),
-  active: integer({ mode: 'boolean' }).default(true),
-})
-export const cards = sqliteTable('cards', {
-  id: text().primaryKey(),
-  price: integer({ mode: 'number' }).default(0),
-})
-
-export const orders = sqliteTable('orders', {
-  id: integer().primaryKey({ autoIncrement: true }),
-  price: integer(),
-  amount: integer(),
-  createdAd: integer('created_at', { mode: 'timestamp' }).default(
+export const purchases = sqliteTable('purchases', {
+  id: integer({ mode: 'number' }).primaryKey({ autoIncrement: true }),
+  cardId: text().notNull(),
+  purchaseDate: integer('purchase_date', { mode: 'timestamp' }).default(
     sql`(unixepoch())`,
   ),
-  by: integer('ordered_by')
+  price: integer(),
+  quantity: integer(),
+  remaining: integer(),
+})
+
+export const allocations = sqliteTable('allocations', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  orderId: integer()
     .notNull()
-    .references(() => users.phone),
+    .references(() => orders.id),
+  purchaseId: integer()
+    .notNull()
+    .references(() => purchases.id),
+  allocatedAt: integer('allocated_at', { mode: 'timestamp' })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  quantity: integer(),
+})
+export const orders = sqliteTable('orders', {
+  id: integer({ mode: 'number' }).primaryKey({ autoIncrement: true }),
+  orderedAt: integer('ordered_at', { mode: 'timestamp' })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  quantity: integer(),
+  price: integer(),
 })
