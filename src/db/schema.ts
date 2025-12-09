@@ -8,6 +8,7 @@ export const purchases = sqliteTable('purchases', {
     sql`(unixepoch())`,
   ),
   price: integer(),
+  sellingPrice:integer("selling_price"),
   quantity: integer(),
   remaining: integer(),
 })
@@ -24,6 +25,7 @@ export const allocations = sqliteTable('allocations', {
     .notNull()
     .default(sql`(unixepoch())`),
   quantity: integer(),
+  sellingPrice:integer("selling_price")
 })
 export const orders = sqliteTable('orders', {
   id: integer({ mode: 'number' }).primaryKey({ autoIncrement: true }),
@@ -33,3 +35,5 @@ export const orders = sqliteTable('orders', {
   quantity: integer(),
   price: integer(),
 })
+
+
