@@ -23,14 +23,21 @@ function RouteComponent() {
     },
     validators: {
       onBlur: schema,
+      onChange: schema,
     },
     onSubmit(props) {
       console.log(props.value)
     },
+    onSubmitInvalid() {
+      ;(
+        document.querySelector("input[data-has-error]") as HTMLInputElement
+      )?.focus()
+    },
   })
   return (
-    <div className="w-full max-w-md p-4">
+    <div className="w-full max-w-md p-4 mx-auto mt-8">
       <form
+        className="space-y-4 px-4 py-8 border rounded-lg border-slate-300 shadow shadow-gray-200 "
         onSubmit={(e) => {
           e.preventDefault()
           e.stopPropagation()

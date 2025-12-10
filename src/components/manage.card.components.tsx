@@ -1,5 +1,8 @@
 import { useFieldContext, useFormContext } from "@/hooks/manage.cad.context"
 import { useStore } from "@tanstack/react-form"
+import { Label } from "./ui/label"
+import { Input } from "./ui/input"
+import { Button } from "./ui/button"
 
 function ErrorMessages({
   errors,
@@ -8,7 +11,7 @@ function ErrorMessages({
 }) {
   return (
     <>
-      {errors.map((error) => (
+      {errors?.map((error) => (
         <div
           key={typeof error === "string" ? error : error.message}
           className="text-red-500 mt-1 font-bold"
@@ -26,12 +29,16 @@ type InputProps = {
 }
 export function TextInput({ label, numeric = false }: InputProps) {
   const field = useFieldContext<string | number>()
-  const errors = useStore(field.store, (s) => s.meta.errors)
+  const errors = useStore(
+    field.store,
+    (s) => s.meta.errorMap.onChange || s.meta.errorMap.onBlur,
+  )
+  console.log({ errors })
   return (
     <div className="space-y-2">
-      <label>
+      <Label className="flex flex-col gap-y-2 items-start">
         <span>{label}</span>
-        <input
+        <Input
           type={numeric ? "number" : "text"}
           value={field.state.value}
           onBlur={field.handleBlur}
@@ -40,8 +47,9 @@ export function TextInput({ label, numeric = false }: InputProps) {
               numeric ? Number(e.target.value) : e.target.value,
             )
           }
+          data-has-error={errors?.length > 0}
         />
-      </label>
+      </Label>
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
       {/* {field.state.meta.isTouched && errors && errors.length > 0 && (
         <ul className="text-red-600">
@@ -59,8 +67,12 @@ export function Submit() {
   const isSubmitting = useStore(form.store, (s) => s.isSubmitting)
   const canSubmit = useStore(form.store, (s) => s.canSubmit)
   return (
-    <button disabled={!canSubmit} type="submit">
+    <Button
+      disabled={!canSubmit}
+      type="submit"
+      className="block mx-auto disabled:bg-gray-400"
+    >
       {isSubmitting ? "Wait..." : "Submit"}
-    </button>
+    </Button>
   )
 }

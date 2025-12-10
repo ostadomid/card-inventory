@@ -12,7 +12,7 @@ export const Route = createFileRoute("/dashboard")({
 
 function RouteComponent() {
   return (
-    <div className="bg-amber-800 h-[calc(100vh-72px)] flex flex-col">
+    <div className="bg-slate-50 h-[calc(100vh-72px)] flex flex-col">
       <div className="flex justify-between gap-4 max-w-md mx-auto space-x-4 rounded-b-lg bg-amber-300 p-2 h-8 hover:h-24 transform transition-all ease-in-out duration-150">
         <Link
           to="/dashboard/addcard"
