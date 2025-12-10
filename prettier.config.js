@@ -3,8 +3,10 @@
 /** @type {import('prettier').Config} */
 const config = {
   semi: false,
-  singleQuote: true,
+  singleQuote: false,
   trailingComma: "all",
+  useTabs:false,
+  tabWidth:2
 };
 
 export default config;

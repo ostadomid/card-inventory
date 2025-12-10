@@ -1,3 +1,5 @@
+import { db } from '@/db'
+import { purchases } from '@/db/schema'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   Zap,
@@ -7,6 +9,8 @@ import {
   Waves,
   Sparkles,
 } from 'lucide-react'
+
+
 
 export const Route = createFileRoute('/')({ component: App })
 
