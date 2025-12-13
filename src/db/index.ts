@@ -14,5 +14,6 @@ declare global {
   }
 }
 
+console.log({DATABASE_URL:process.env.DATABASE_URL})
 const sqlite = new Database(process.env.DATABASE_URL)
 export const db = drizzle(sqlite, { schema })

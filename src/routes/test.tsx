@@ -241,7 +241,7 @@ function RouteComponent() {
             </PopoverTrigger>
             <PopoverContent className="max-w-[200px]">
               <Command
-                filter={(v, s) => {
+                filter={(v: string | any[], s: any) => {
                   console.log({ v, s })
                   return v.includes(s) ? 1 : 0
                 }}

@@ -1,16 +1,30 @@
-import { TextInput } from "@/components/manage.card.components"
+import { db } from "@/db"
+import { purchases } from "@/db/schema"
 import { useCardForm } from "@/hooks/manage.card.hook"
 import { createFileRoute } from "@tanstack/react-router"
+import { createServerFn } from "@tanstack/react-start"
+import { GhostIcon } from "lucide-react"
+import { toast } from "sonner"
 import z from "zod"
 
-export const Route = createFileRoute("/dashboard/addcard")({
-  component: RouteComponent,
-})
 const schema = z.object({
   cardId: z.string().min(3),
   quantity: z.number().min(1),
   price: z.number().min(1000),
   sellingPrice: z.number().min(1000),
+})
+
+const addNewCard = createServerFn({ method: "POST" })
+  .inputValidator(schema)
+  .handler(async ({ data }) => {
+    const result = await db
+      .insert(purchases)
+      .values({ ...data, remaining: data.quantity })
+    return { msg: `${result.changes} record(s) added.` }
+  })
+
+export const Route = createFileRoute("/dashboard/addcard")({
+  component: RouteComponent,
 })
 
 function RouteComponent() {
@@ -25,8 +39,12 @@ function RouteComponent() {
       onBlur: schema,
       onChange: schema,
     },
-    onSubmit(props) {
-      console.log(props.value)
+    async onSubmit(props) {
+      // console.log(props.value)
+      addNewCard({ data: props.value }).then(({ msg }) => {
+        toast.success(msg, { duration: 1500 })
+        form.reset()
+      })
     },
     onSubmitInvalid() {
       ;(
