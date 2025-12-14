@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestRouteImport } from './routes/test'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardAddphotoRouteImport } from './routes/dashboard/addphoto'
 import { Route as DashboardAddcardRouteImport } from './routes/dashboard/addcard'
+import { Route as ApiV1UploadRouteImport } from './routes/api/v1/upload'
 
 const TestRoute = TestRouteImport.update({
   id: '/test',
@@ -29,10 +31,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardAddphotoRoute = DashboardAddphotoRouteImport.update({
+  id: '/addphoto',
+  path: '/addphoto',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const DashboardAddcardRoute = DashboardAddcardRouteImport.update({
   id: '/addcard',
   path: '/addcard',
   getParentRoute: () => DashboardRouteRoute,
+} as any)
+const ApiV1UploadRoute = ApiV1UploadRouteImport.update({
+  id: '/api/v1/upload',
+  path: '/api/v1/upload',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -40,12 +52,16 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/test': typeof TestRoute
   '/dashboard/addcard': typeof DashboardAddcardRoute
+  '/dashboard/addphoto': typeof DashboardAddphotoRoute
+  '/api/v1/upload': typeof ApiV1UploadRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/test': typeof TestRoute
   '/dashboard/addcard': typeof DashboardAddcardRoute
+  '/dashboard/addphoto': typeof DashboardAddphotoRoute
+  '/api/v1/upload': typeof ApiV1UploadRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,19 +69,41 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/test': typeof TestRoute
   '/dashboard/addcard': typeof DashboardAddcardRoute
+  '/dashboard/addphoto': typeof DashboardAddphotoRoute
+  '/api/v1/upload': typeof ApiV1UploadRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/test' | '/dashboard/addcard'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/test'
+    | '/dashboard/addcard'
+    | '/dashboard/addphoto'
+    | '/api/v1/upload'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/test' | '/dashboard/addcard'
-  id: '__root__' | '/' | '/dashboard' | '/test' | '/dashboard/addcard'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/test'
+    | '/dashboard/addcard'
+    | '/dashboard/addphoto'
+    | '/api/v1/upload'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/test'
+    | '/dashboard/addcard'
+    | '/dashboard/addphoto'
+    | '/api/v1/upload'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   TestRoute: typeof TestRoute
+  ApiV1UploadRoute: typeof ApiV1UploadRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -91,6 +129,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/addphoto': {
+      id: '/dashboard/addphoto'
+      path: '/addphoto'
+      fullPath: '/dashboard/addphoto'
+      preLoaderRoute: typeof DashboardAddphotoRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/addcard': {
       id: '/dashboard/addcard'
       path: '/addcard'
@@ -98,15 +143,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAddcardRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/api/v1/upload': {
+      id: '/api/v1/upload'
+      path: '/api/v1/upload'
+      fullPath: '/api/v1/upload'
+      preLoaderRoute: typeof ApiV1UploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface DashboardRouteRouteChildren {
   DashboardAddcardRoute: typeof DashboardAddcardRoute
+  DashboardAddphotoRoute: typeof DashboardAddphotoRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAddcardRoute: DashboardAddcardRoute,
+  DashboardAddphotoRoute: DashboardAddphotoRoute,
 }
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
@@ -117,6 +171,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   TestRoute: TestRoute,
+  ApiV1UploadRoute: ApiV1UploadRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
