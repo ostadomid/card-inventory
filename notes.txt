@@ -1,0 +1,53 @@
+./weed master -ip=localhost -mdir="./data/master"
+./weed volume -ip="localhost" -dir="./data/volume"
+./weed filer -port="8888" -master="localhost:9333"
+./weed s3 -config="./s3config.json"
+
+S3 Config::
+
+{
+  "identities": [
+    {
+      "name": "admin",
+      "credentials": [
+        {
+          "accessKey": "super_secure_key",
+          "secretKey": "super_secure_secret"
+        }
+      ],
+      "actions": [
+       "Admin",
+        "Read",
+        "Write",
+        "List",
+        "Tagging"
+      ]
+    },
+    {
+      "name": "anonymous",
+      "actions": [
+        "Read"
+      ]
+    }
+  ],
+  "cors": {
+    "allowedOrigins": [
+      "*"
+    ],
+    "allowedMethods": [
+      "GET",
+      "PUT",
+      "POST",
+      "DELETE",
+      "HEAD"
+    ],
+    "allowedHeaders": [
+      "*"
+    ],
+    "exposedHeaders": [
+      "ETag"
+    ],
+    "maxAgeSeconds": 3600
+  }
+}
+
