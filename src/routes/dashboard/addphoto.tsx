@@ -2,6 +2,7 @@ import z from "zod"
 import { useUploadFile } from "@better-upload/client"
 import { useForm } from "@tanstack/react-form"
 import { createFileRoute } from "@tanstack/react-router"
+import { toast } from "sonner"
 import {
   Card,
   CardContent,
@@ -22,7 +23,6 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
-import { toast } from "sonner"
 
 export const Route = createFileRoute("/dashboard/addphoto")({
   component: RouteComponent,
