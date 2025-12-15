@@ -1,31 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router"
 
 import { handleRequest, route } from "@better-upload/server"
-import { tigris } from "@better-upload/server/clients"
+import { minio } from "@better-upload/server/clients"
 import type { Router } from "@better-upload/server"
 
 const router: Router = {
   bucketName: "card-inventory",
-  client: tigris({
-    endpoint:"https://t3.storage.dev",
-    accessKeyId:"tid_TmyloVuvHBFBcgiDXLCLUEwtHpGEtyUNsirtKPeTtGpvsHMNUh",
-     secretAccessKey:"tsec_c8_wMArRcOvuXetyRe+6GjM-gjFLU4yYLGZCXo6W-Zc28NYGTNmv19SFJj7kS5LthyDs6A"
-    // host: "localhost:8333",
-    // region: "alaki",
-    // accessKeyId: "super_secure_key",
-    // secretAccessKey: "super_secure_secret",
-    // secure: false,
-    // forcePathStyle: true,
+  client: minio({
+    region:"us-east-1",
+    endpoint:"http://localhost:9000",
+     accessKeyId: process.env.ACCESS_KEY||"",
+     secretAccessKey: process.env.SECRET_KEY||"",
   }),
 
   routes: {
     cards: route({
       fileTypes: ["image/*"],
       maxFileSize: 35 * 1024 * 1024,
-      onAfterSignedUrl(data) {
-        // console.log({data})
-        return data.file.objectInfo
-      },
+      
     }),
   },
 }
