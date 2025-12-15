@@ -1,11 +1,27 @@
-import { useUploadFile } from "@better-upload/client"
-import { createFileRoute } from "@tanstack/react-router"
-import { createServerFn } from "@tanstack/react-start"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { UploadButton } from "@/components/upload-button"
-import { useState } from "react"
 import z from "zod"
+import { useUploadFile } from "@better-upload/client"
 import { useForm } from "@tanstack/react-form"
+import { createFileRoute } from "@tanstack/react-router"
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { UploadButton } from "@/components/upload-button"
+import { Button } from "@/components/ui/button"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group"
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field"
 
 export const Route = createFileRoute("/dashboard/addphoto")({
   component: RouteComponent,
@@ -13,54 +29,113 @@ export const Route = createFileRoute("/dashboard/addphoto")({
 
 const schema = z.object({
   cardId: z.string().min(3, "A valid CardId is required"),
-  image: z.file(),
+  image: z.instanceof(File).refine((f) => f.size > 0, "Choose a valid file"),
 })
-
-type FormType = z.infer<typeof schema>
 
 function RouteComponent() {
   const form = useForm({
     defaultValues: {
       cardId: "",
-      image: 0 as unknown,
+      image: new File([], "alaki.txt"),
     },
     validators: {
       onBlur: schema,
+      onChange: schema,
     },
-    onSubmit(props) {},
+    onSubmit(props) {
+      console.log({ props })
+    },
+    onSubmitInvalid(props) {
+      console.log("Invalid")
+      console.log({ invalidProps: props })
+      console.log({
+        onChangeErrors: form.state.errorMap.onChange,
+        onBlurErrors: form.state.errorMap.onBlur,
+      })
+    },
   })
   const uploader = useUploadFile({
     route: "cards",
-    onUploadBegin(data) {
-      console.log({ uploadBegin: data })
-    },
     onError(error) {
-      console.log("Error")
       console.log({ error })
     },
-    onUploadComplete(data) {},
   })
   return (
-    <Card>
+    <Card className="w-full sm:max-w-md mx-auto mt-4">
       <CardHeader>
         <CardTitle>Upload Card Photo</CardTitle>
       </CardHeader>
       <CardContent>
-        <UploadButton
-          control={uploader.control}
-          uploadOverride={(input, options) => {
-            alert(input.name)
-            console.log({ options })
+        <form
+          id="form-tanstack-input"
+          onSubmit={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            form.handleSubmit()
           }}
-        />
-        {uploader.control.uploadedFile && (
-          <img
-            className="border rounded-lg w-80 aspect-square object-contain"
-            src={`http://localhost:9000/card-inventory/${uploader.control.uploadedFile.objectInfo.key}`}
-            alt="uploaded image"
-          />
-        )}
+        >
+          <FieldGroup>
+            <form.Field name="cardId">
+              {(field) => (
+                <Field
+                  data-invalid={
+                    field.state.meta.isTouched && !field.state.meta.isValid
+                  }
+                >
+                  <InputGroup>
+                    <InputGroupInput
+                      name={field.name}
+                      id={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                    <InputGroupAddon>
+                      <FieldLabel htmlFor="cardId">Card ID</FieldLabel>
+                    </InputGroupAddon>
+                  </InputGroup>
+
+                  <FieldError errors={field.state.meta.errorMap.onChange} />
+                </Field>
+              )}
+            </form.Field>
+
+            <form.Field name="image">
+              {(field) => (
+                <Field>
+                  <FieldLabel>Card Image</FieldLabel>
+                  <UploadButton
+                    accept="image/*"
+                    id={field.name}
+                    control={uploader.control}
+                    uploadOverride={(input) => {
+                      form.setFieldValue("image", input)
+                      form.validate("change")
+                      form.validate("blur")
+                    }}
+                  />
+                  {field.state.meta.isTouched && !field.state.meta.isValid && (
+                    <FieldError errors={field.state.meta.errorMap.onChange} />
+                  )}
+                </Field>
+              )}
+            </form.Field>
+            {uploader.control.uploadedFile && (
+              <img
+                className="border rounded-lg w-80 aspect-square object-contain"
+                src={`http://localhost:9000/card-inventory/${uploader.control.uploadedFile.objectInfo.key}`}
+                alt="uploaded image"
+              />
+            )}
+          </FieldGroup>
+        </form>
       </CardContent>
+      <CardFooter>
+        <Field orientation={"horizontal"}>
+          <Button type="submit" form="form-tanstack-input">
+            Save
+          </Button>
+        </Field>
+      </CardFooter>
     </Card>
   )
 }
