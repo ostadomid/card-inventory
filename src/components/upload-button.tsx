@@ -1,19 +1,19 @@
-import { Button } from '@/components/ui/button';
-import type { UploadHookControl } from '@better-upload/client';
-import { Loader2, Upload } from 'lucide-react';
-import { useId } from 'react';
+import { Button } from "@/components/ui/button"
+import type { UploadHookControl } from "@better-upload/client"
+import { Loader2, Upload } from "lucide-react"
+import { useId } from "react"
 
 type UploadButtonProps = {
-  control: UploadHookControl<false>;
-  id?: string;
-  accept?: string;
-  metadata?: Record<string, unknown>;
+  control: UploadHookControl<false>
+  id?: string
+  accept?: string
+  metadata?: Record<string, unknown>
   uploadOverride?: (
-    ...args: Parameters<UploadHookControl<false>['upload']>
-  ) => void;
+    ...args: Parameters<UploadHookControl<false>["upload"]>
+  ) => void
 
   // Add any additional props you need.
-};
+}
 
 export function UploadButton({
   control: { upload, isPending },
@@ -22,7 +22,7 @@ export function UploadButton({
   metadata,
   uploadOverride,
 }: UploadButtonProps) {
-  const id = useId();
+  const id = useId()
 
   return (
     <Button disabled={isPending} className="relative" type="button">
@@ -35,26 +35,26 @@ export function UploadButton({
           onChange={(e) => {
             if (e.target.files?.[0] && !isPending) {
               if (uploadOverride) {
-                uploadOverride(e.target.files[0], { metadata });
+                uploadOverride(e.target.files[0], { metadata })
               } else {
-                upload(e.target.files[0], { metadata });
+                upload(e.target.files[0], { metadata })
               }
             }
-            e.target.value = '';
+            e.target.value = ""
           }}
         />
       </label>
       {isPending ? (
         <>
           <Loader2 className="size-4 animate-spin" />
-          Upload file
+          Choose a file
         </>
       ) : (
         <>
           <Upload className="size-4" />
-          Upload file
+          Choose a file
         </>
       )}
     </Button>
-  );
+  )
 }

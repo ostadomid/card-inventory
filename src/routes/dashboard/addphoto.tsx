@@ -22,6 +22,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
+import { toast } from "sonner"
 
 export const Route = createFileRoute("/dashboard/addphoto")({
   component: RouteComponent,
@@ -43,7 +44,9 @@ function RouteComponent() {
       onChange: schema,
     },
     onSubmit(props) {
-      console.log({ props })
+      return uploader.uploadAsync(props.value.image).then((r) => {
+        toast.success("Saved Successfully")
+      })
     },
     onSubmitInvalid(props) {
       console.log("Invalid")
@@ -58,6 +61,9 @@ function RouteComponent() {
     route: "cards",
     onError(error) {
       console.log({ error })
+    },
+    onUploadProgress(data) {
+      console.log(data.file.progress)
     },
   })
   return (
@@ -130,11 +136,19 @@ function RouteComponent() {
         </form>
       </CardContent>
       <CardFooter>
-        <Field orientation={"horizontal"}>
-          <Button type="submit" form="form-tanstack-input">
-            Save
-          </Button>
-        </Field>
+        <form.Subscribe selector={(s) => s.isSubmitting}>
+          {(isSubmitting) => (
+            <Field orientation={"horizontal"}>
+              <Button
+                disabled={isSubmitting}
+                type="submit"
+                form="form-tanstack-input"
+              >
+                {isSubmitting ? "Saving..." : "Save"}
+              </Button>
+            </Field>
+          )}
+        </form.Subscribe>
       </CardFooter>
     </Card>
   )

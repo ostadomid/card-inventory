@@ -1,6 +1,7 @@
 import { db } from "@/db"
 import { purchases } from "@/db/schema"
 import { useCardForm } from "@/hooks/manage.card.hook"
+import { useUploadFile } from "@better-upload/client"
 import { createFileRoute } from "@tanstack/react-router"
 import { createServerFn } from "@tanstack/react-start"
 import { GhostIcon } from "lucide-react"
@@ -12,6 +13,7 @@ const schema = z.object({
   quantity: z.number().min(1),
   price: z.number().min(1000),
   sellingPrice: z.number().min(1000),
+  image: z.file().min(10),
 })
 
 const addNewCard = createServerFn({ method: "POST" })
@@ -28,12 +30,14 @@ export const Route = createFileRoute("/dashboard/addcard")({
 })
 
 function RouteComponent() {
+  const uploader = useUploadFile({ route: "cards" })
   const form = useCardForm({
     defaultValues: {
       cardId: "",
       quantity: 50,
       price: 1000,
       sellingPrice: 2000,
+      image: new File([], "dummy"),
     },
     validators: {
       onBlur: schema,
@@ -73,6 +77,9 @@ function RouteComponent() {
         </form.AppField>
         <form.AppField name="sellingPrice">
           {(field) => <field.TextInput label="Selling Price" numeric />}
+        </form.AppField>
+        <form.AppField name="image">
+          {(field) => <field.FileUploader control={uploader.control} />}
         </form.AppField>
         <form.AppForm>
           <form.Submit />
