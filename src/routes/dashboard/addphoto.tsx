@@ -30,14 +30,16 @@ export const Route = createFileRoute("/dashboard/addphoto")({
 
 const schema = z.object({
   cardId: z.string().min(3, "A valid CardId is required"),
-  image: z.instanceof(File).refine((f) => f.size > 0, "Choose a valid file"),
+  image: z
+    .instanceof(File)
+    .refine((f) => f.size > 0, "Choose a valid/non empty file"),
 })
 
 function RouteComponent() {
   const form = useForm({
     defaultValues: {
       cardId: "",
-      image: new File([], "alaki.txt"),
+      image: new File([], "alaki"),
     },
     validators: {
       onBlur: schema,

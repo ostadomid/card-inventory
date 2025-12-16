@@ -1,5 +1,5 @@
 import { useStore } from "@tanstack/react-form"
-import { useRef, useState } from "react"
+import { Activity, useRef } from "react"
 import { Label } from "./ui/label"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils"
 function ErrorMessages({
   errors,
 }: {
-  errors: Array<string | { message: string }>
+  errors?: Array<string | { message: string }>
 }) {
   return (
     <>
@@ -96,16 +96,19 @@ export function FileUploader({ control }: FileUploaderProps) {
       <FieldLabel htmlFor="photo-uploader">Card Photo</FieldLabel>
       <p>Bad Size = {badSize}</p>
       <p>Size = {size}</p>
+      <p>Bad Size = {badSize}</p>
+
       <img alt="preview" ref={preview} className={cn({ hidden: size <= 0 })} />
+
       <UploadButton
         id="photo-uploader"
         control={control}
         uploadOverride={(file) => {
           field.setValue(file)
-          if (preview.current) {
-            ;(preview.current as HTMLImageElement).src =
-              URL.createObjectURL(file)
-          }
+          field.handleChange(file)
+          field.handleBlur()
+          ;(preview.current as unknown as HTMLImageElement).src =
+            URL.createObjectURL(file)
         }}
       />
       {isInvalid && <FieldError errors={field.state.meta.errors} />}
