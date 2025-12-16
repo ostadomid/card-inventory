@@ -1,23 +1,27 @@
-import { db } from "@/db"
-import { purchases } from "@/db/schema"
-import { useCardForm } from "@/hooks/manage.card.hook"
 import { useUploadFile } from "@better-upload/client"
 import { createFileRoute } from "@tanstack/react-router"
 import { createServerFn } from "@tanstack/react-start"
-import { GhostIcon } from "lucide-react"
 import { toast } from "sonner"
 import z from "zod"
+import { useCardForm } from "@/hooks/manage.card.hook"
+import { purchases } from "@/db/schema"
+import { db } from "@/db"
 
 const schema = z.object({
   cardId: z.string().min(3),
   quantity: z.number().min(1),
   price: z.number().min(1000),
   sellingPrice: z.number().min(1000),
-  image: z.file().min(10),
+  image: z.file().refine((f) => f.size > 0, "Choose a non empty image"),
+})
+
+const serverSchema = z.object({
+  ...schema.omit({ image: true }).shape,
+  imageKey: z.string().min(10),
 })
 
 const addNewCard = createServerFn({ method: "POST" })
-  .inputValidator(schema)
+  .inputValidator(serverSchema)
   .handler(async ({ data }) => {
     const result = await db
       .insert(purchases)
@@ -44,10 +48,22 @@ function RouteComponent() {
       onChange: schema,
     },
     async onSubmit(props) {
-      // console.log(props.value)
-      addNewCard({ data: props.value }).then(({ msg }) => {
-        toast.success(msg, { duration: 1500 })
-        form.reset()
+      uploader.uploadAsync(props.value.image).then((res) => {
+        const imageKey = res.file.objectInfo.key
+        // alert(imageKey)
+        const { cardId, price, quantity, sellingPrice } = props.value
+        addNewCard({
+          data: {
+            cardId,
+            quantity,
+            price,
+            sellingPrice,
+            imageKey,
+          },
+        }).then(({ msg }) => {
+          toast.success(msg, { duration: 1500 })
+          form.reset()
+        })
       })
     },
     onSubmitInvalid() {

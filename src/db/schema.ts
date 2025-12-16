@@ -11,6 +11,7 @@ export const purchases = sqliteTable('purchases', {
   sellingPrice:integer("selling_price"),
   quantity: integer(),
   remaining: integer(),
+  imageKey: text("image_key")
 })
 
 export const allocations = sqliteTable('allocations', {
