@@ -1,18 +1,18 @@
-import { useFieldContext, useFormContext } from "@/hooks/manage.cad.context"
 import { useStore } from "@tanstack/react-form"
+import { Activity, useRef } from "react"
 import { Label } from "./ui/label"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
 import { UploadButton } from "./upload-button"
-import { UploadHookControl } from "@better-upload/client"
 import { Field, FieldError, FieldLabel } from "./ui/field"
-import { useRef, useState } from "react"
+import type { UploadHookControl } from "@better-upload/client"
+import { useFieldContext, useFormContext } from "@/hooks/manage.cad.context"
 import { cn } from "@/lib/utils"
 
 function ErrorMessages({
   errors,
 }: {
-  errors: Array<string | { message: string }>
+  errors?: Array<string | { message: string }>
 }) {
   return (
     <>
@@ -89,21 +89,25 @@ export function FileUploader({ control }: FileUploaderProps) {
   const preview = useRef(null)
   const field = useFieldContext<File>()
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+  const badSize = field.state.value.size
   const size = useStore(field.store, (s) => s.value.size)
   return (
     <Field data-invalid={isInvalid}>
       <FieldLabel htmlFor="photo-uploader">Card Photo</FieldLabel>
       <p>Size = {size}</p>
+      <p>Bad Size = {badSize}</p>
+
       <img alt="preview" ref={preview} className={cn({ hidden: size <= 0 })} />
+
       <UploadButton
         id="photo-uploader"
         control={control}
         uploadOverride={(file) => {
           field.setValue(file)
-          if (preview.current) {
-            ;(preview.current as HTMLImageElement).src =
-              URL.createObjectURL(file)
-          }
+          field.handleChange(file)
+          field.handleBlur()
+          ;(preview.current as unknown as HTMLImageElement).src =
+            URL.createObjectURL(file)
         }}
       />
       {isInvalid && <FieldError errors={field.state.meta.errors} />}
