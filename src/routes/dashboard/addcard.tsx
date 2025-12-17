@@ -3,9 +3,15 @@ import { createFileRoute } from "@tanstack/react-router"
 import { createServerFn } from "@tanstack/react-start"
 import { toast } from "sonner"
 import z from "zod"
-import { useCardForm } from "@/hooks/manage.card.hook"
-import { purchases } from "@/db/schema"
+import { useStore } from "@tanstack/react-form"
+import { useEffect, useState } from "react"
+import { useDebouncedCallback } from "@tanstack/react-pacer"
+import { count, eq, sum } from "drizzle-orm"
+import { Sigma } from "lucide-react"
 import { db } from "@/db"
+import { purchases } from "@/db/schema"
+import { useCardForm } from "@/hooks/manage.card.hook"
+import { Label } from "@/components/ui/label"
 
 const schema = z.object({
   cardId: z.string().min(3),
@@ -29,9 +35,27 @@ const addNewCard = createServerFn({ method: "POST" })
     return { msg: `${result.changes} record(s) added.` }
   })
 
+const cardIdSchema = z.object({ cardId: z.string().min(3) })
+
+const getCardQuantity = createServerFn()
+  .inputValidator(cardIdSchema)
+  .handler(async ({ data: { cardId } }) => {
+    const r = await db
+      .select({ sum: sum(purchases.remaining).mapWith(Number), rows: count() })
+      .from(purchases)
+      .where(eq(purchases.cardId, cardId))
+
+    return { quantity: r[0]?.sum || 0, rows: r[0]?.rows || 0 }
+  })
+
 export const Route = createFileRoute("/dashboard/addcard")({
   component: RouteComponent,
 })
+
+type CardInfo = {
+  quantity: number
+  timesPurchased: number
+}
 
 function RouteComponent() {
   const uploader = useUploadFile({ route: "cards" })
@@ -47,7 +71,7 @@ function RouteComponent() {
       onBlur: schema,
       onChange: schema,
     },
-    async onSubmit(props) {
+    onSubmit(props) {
       uploader.uploadAsync(props.value.image).then((res) => {
         const imageKey = res.file.objectInfo.key
         // alert(imageKey)
@@ -66,12 +90,27 @@ function RouteComponent() {
         })
       })
     },
-    onSubmitInvalid() {
-      ;(
-        document.querySelector("input[data-has-error]") as HTMLInputElement
-      )?.focus()
-    },
+    onSubmitInvalid() {},
   })
+  const cardIdUserEntered = useStore(form.store, (s) => s.values.cardId)
+
+  const [cardInfo, setCardInfo] = useState<CardInfo | null>(null)
+  const debouncedGetCardQuantity = useDebouncedCallback(
+    (cardId: string) =>
+      getCardQuantity({ data: { cardId } })
+        .then((r) => {
+          setCardInfo({ quantity: r.quantity, timesPurchased: r.rows })
+        })
+        .catch((err) => {
+          setCardInfo(null)
+          console.log({ error: err, where: "calling getCardQuantity" })
+        }),
+    { wait: 1500 },
+  )
+  useEffect(() => {
+    cardIdSchema.safeParse({ cardId: cardIdUserEntered }).success &&
+      debouncedGetCardQuantity(cardIdUserEntered)
+  }, [cardIdUserEntered])
   return (
     <div className="w-full max-w-md p-4 mx-auto mt-8">
       <form
@@ -83,7 +122,26 @@ function RouteComponent() {
         }}
       >
         <form.AppField name="cardId">
-          {(field) => <field.TextInput label="Card ID" />}
+          {(field) => (
+            <>
+              <field.TextInput label="Card ID" />
+              {cardInfo ? (
+                <Label>
+                  {cardInfo.timesPurchased > 0 ? (
+                    <>
+                      <Sigma size={16} />
+                      {cardInfo.quantity}
+                    </>
+                  ) : (
+                    <>
+                      <Sigma size={16} />
+                      <span>New Card</span>
+                    </>
+                  )}
+                </Label>
+              ) : null}
+            </>
+          )}
         </form.AppField>
         <form.AppField name="quantity">
           {(field) => <field.TextInput label="Quantity" numeric />}

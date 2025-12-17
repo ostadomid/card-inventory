@@ -38,7 +38,7 @@ export function TextInput({ label, numeric = false }: InputProps) {
     field.store,
     (s) => s.meta.errorMap.onChange || s.meta.errorMap.onBlur,
   )
-  console.log({ errors })
+
   return (
     <div className="space-y-2">
       <Label className="flex flex-col gap-y-2 items-start">
@@ -89,15 +89,11 @@ export function FileUploader({ control }: FileUploaderProps) {
   const preview = useRef(null)
   const field = useFieldContext<File>()
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
-  const badSize = field.state.value.size
   const size = useStore(field.store, (s) => s.value.size)
+  // const badSize = field.state.value.size
   return (
     <Field data-invalid={isInvalid}>
       <FieldLabel htmlFor="photo-uploader">Card Photo</FieldLabel>
-      <p>Bad Size = {badSize}</p>
-      <p>Size = {size}</p>
-      <p>Bad Size = {badSize}</p>
-
       <img alt="preview" ref={preview} className={cn({ hidden: size <= 0 })} />
 
       <UploadButton
