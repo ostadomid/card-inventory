@@ -1,13 +1,19 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router"
+import { Link, Outlet, createFileRoute, redirect } from "@tanstack/react-router"
+import { ArrowBigDownDash, ClipboardList, ShoppingCart } from "lucide-react"
+import { getSessionFN } from "@/fns"
 import {
-  ArrowBigDownDash,
-  ClipboardList,
-  ShoppingBasket,
-  ShoppingCart,
-} from "lucide-react"
+  IconBasketDown,
+  IconBasketUp,
+  IconListDetails,
+} from "@tabler/icons-react"
 
 export const Route = createFileRoute("/dashboard")({
   component: RouteComponent,
+  async beforeLoad() {
+    const { session } = await getSessionFN()
+    if (!session) throw redirect({ to: "/login" })
+    return { session }
+  },
 })
 
 function RouteComponent() {
@@ -18,21 +24,24 @@ function RouteComponent() {
           to="/dashboard/addcard"
           className="w-20 rounded-lg aspect-square flex flex-col justify-center items-center hover:bg-amber-500 transform transition-colors ease-in-out duration-150"
         >
-          <ArrowBigDownDash size={24} />
+          {/* <ArrowBigDownDash size={24} /> */}
+          <IconBasketDown size={32} />
           <span className="font-medium">Buy Cards</span>
         </Link>
         <Link
           to="/test"
           className="w-20 rounded-lg aspect-square flex flex-col justify-center items-center  hover:bg-amber-500 transform transition-colors ease-in-out duration-150"
         >
-          <ShoppingCart size={24} />
+          {/* <ShoppingCart size={32} /> */}
+          <IconBasketUp size={32} />
           <span className="font-medium">Sell Cards</span>{" "}
         </Link>
         <Link
-          to="/test"
+          to="/dashboard/cards"
           className="w-20 rounded-lg aspect-square flex flex-col justify-center items-center  hover:bg-amber-500 transform transition-colors ease-in-out duration-150"
         >
-          <ClipboardList size={24} />
+          {/* <ClipboardList size={32} /> */}
+          <IconListDetails size={32} />
           <span className="font-medium">All Cards</span>{" "}
         </Link>
       </div>

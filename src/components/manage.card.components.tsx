@@ -31,20 +31,23 @@ function ErrorMessages({
 type InputProps = {
   label: string
   numeric?: boolean
+  password?: boolean
 }
-export function TextInput({ label, numeric = false }: InputProps) {
+export function TextInput({
+  label,
+  numeric = false,
+  password = false,
+}: InputProps) {
   const field = useFieldContext<string | number>()
-  const errors = useStore(
-    field.store,
-    (s) => s.meta.errorMap.onChange || s.meta.errorMap.onBlur,
-  )
+  const errors = useStore(field.store, (s) => s.meta.errorMap.onChange)
+  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
 
   return (
     <div className="space-y-2">
       <Label className="flex flex-col gap-y-2 items-start">
         <span>{label}</span>
         <Input
-          type={numeric ? "number" : "text"}
+          type={numeric ? "number" : password ? "password" : "text"}
           value={field.state.value}
           onBlur={field.handleBlur}
           onChange={(e) =>
@@ -55,7 +58,7 @@ export function TextInput({ label, numeric = false }: InputProps) {
           data-has-error={errors?.length > 0}
         />
       </Label>
-      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
+      {isInvalid && <ErrorMessages errors={errors} />}
       {/* {field.state.meta.isTouched && errors && errors.length > 0 && (
         <ul className="text-red-600">
           {errors.map((err, idx) => (
@@ -67,17 +70,27 @@ export function TextInput({ label, numeric = false }: InputProps) {
   )
 }
 
-export function Submit() {
+export function Submit({
+  label = "Submit",
+  formId,
+}: {
+  label?: string
+  formId?: string
+}) {
   const form = useFormContext()
-  const isSubmitting = useStore(form.store, (s) => s.isSubmitting)
-  const canSubmit = useStore(form.store, (s) => s.canSubmit)
+  const [isFormValid, isSubmitting] = useStore(form.store, (s) => [
+    s.isFieldsValid,
+    s.isSubmitting,
+  ])
+  console.log({ store: form.state })
   return (
     <Button
-      disabled={!canSubmit}
+      disabled={!isFormValid}
       type="submit"
+      form={formId}
       className="block mx-auto disabled:bg-gray-400"
     >
-      {isSubmitting ? "Wait..." : "Submit"}
+      {isSubmitting ? "Wait..." : label}
     </Button>
   )
 }

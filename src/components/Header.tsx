@@ -1,21 +1,23 @@
-import { Link } from "@tanstack/react-router"
-
-import { ReactNode, useMemo, useState } from "react"
+import { Link, useNavigate } from "@tanstack/react-router"
 import {
-  ChevronDown,
-  ChevronRight,
-  ClipboardType,
-  Database,
-  Home,
-  Menu,
-  Network,
-  SquareFunction,
-  StickyNote,
-  Cog,
-  X,
-  LucideIcon,
-} from "lucide-react"
-import { FileRouteTypes } from "@/routeTree.gen"
+  IconAddressBook,
+  IconBrandTwitterFilled,
+  IconLogout,
+  IconUserCircle,
+} from "@tabler/icons-react"
+import { Activity, useMemo, useState } from "react"
+import { Cog, Home, LogOutIcon, Menu, User2, X } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu"
+import { Button } from "./ui/button"
+import type { LucideIcon } from "lucide-react"
+import type { FileRouteTypes } from "@/routeTree.gen"
+import { signOut, useSession } from "@/lib/auth-client"
 
 type Menu = {
   title: string
@@ -24,8 +26,10 @@ type Menu = {
 }
 
 export default function Header() {
+  const { data } = useSession()
+  const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
-  const items = useMemo<Menu[]>(
+  const items = useMemo<Array<Menu>>(
     () => [
       { title: "Home", icon: Home, to: "/" },
       { title: "Dashboard", icon: Cog, to: "/dashboard" },
@@ -52,6 +56,33 @@ export default function Header() {
             />
           </Link>
         </h1>
+        <Activity mode={data ? "visible" : "hidden"}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="ml-auto cursor-pointer hover:bg-purple-700">
+                <IconUserCircle /> {data?.user.name}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>
+                <IconAddressBook /> Profile
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  signOut().then((r) => {
+                    if (r.data?.success) {
+                      navigate({ to: "/", reloadDocument: true })
+                    }
+                  })
+                }}
+              >
+                <IconLogout />
+                Signout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </Activity>
       </header>
 
       <aside
