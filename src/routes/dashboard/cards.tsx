@@ -1,3 +1,13 @@
+import { createFileRoute } from "@tanstack/react-router"
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
+import { format, parse } from "date-fns-jalali"
+import { ZoomIn } from "lucide-react"
+import { toast } from "sonner"
+import type { ColumnDef } from "@tanstack/react-table"
 import {
   Table,
   TableBody,
@@ -6,16 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { createFileRoute } from "@tanstack/react-router"
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
-import { parse, format } from "date-fns-jalali"
-import { ZoomIn } from "lucide-react"
-import { toast } from "sonner"
+import { Dialog, DialogTrigger } from "@/components/ui/dialog"
+import { DialogContent } from "@radix-ui/react-dialog"
 
 type Purchase = {
   cardId: string
@@ -29,7 +31,7 @@ type Purchase = {
 
 const numberFormat = (value: number) => Intl.NumberFormat("IR-fa").format(value)
 
-const columns: ColumnDef<Purchase>[] = [
+const columns: Array<ColumnDef<Purchase>> = [
   {
     accessorKey: "cardId",
     header: "Card ID",
@@ -67,11 +69,12 @@ const columns: ColumnDef<Purchase>[] = [
   {
     accessorKey: "imageKey",
     cell: ({ getValue }) => (
-      <ZoomIn
-        className="cursor-pointer"
-        size={16}
-        onClick={() => toast.info(getValue() as string)}
-      />
+      <Dialog>
+        <DialogTrigger asChild>
+          <ZoomIn className="cursor-pointer" size={16} />
+        </DialogTrigger>
+        <DialogContent></DialogContent>
+      </Dialog>
     ),
   },
 ]
