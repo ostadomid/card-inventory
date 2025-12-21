@@ -4,9 +4,8 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { format, parse } from "date-fns-jalali"
-import { ZoomIn } from "lucide-react"
-import { toast } from "sonner"
+import { format } from "date-fns-jalali"
+import { Image, ZoomIn } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 import {
   Table,
@@ -16,8 +15,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"
-import { DialogContent } from "@radix-ui/react-dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 type Purchase = {
   cardId: string
@@ -34,46 +37,52 @@ const numberFormat = (value: number) => Intl.NumberFormat("IR-fa").format(value)
 const columns: Array<ColumnDef<Purchase>> = [
   {
     accessorKey: "cardId",
-    header: "Card ID",
+    header: "کد",
     cell(props) {
       return <span className="font-medium">{props.getValue() as string}</span>
     },
   },
   {
     accessorKey: "purchaseDate",
-    header: "Date",
+    header: "تاریخ خرید",
     cell(props) {
       return <span>{format(props.getValue() as string, "yyyy-MM-dd")}</span>
     },
   },
   {
     accessorKey: "quantity",
-    header: "Quantity",
+    header: "تعداد",
     cell: ({ getValue }) => numberFormat(getValue() as number),
   },
   {
     accessorKey: "price",
-    header: "Pirce",
+    header: "قیمت خرید",
     cell: ({ getValue }) => numberFormat(getValue() as number),
   },
   {
     accessorKey: "sellingPrice",
-    header: "Selling",
+    header: "قیمت فروش",
     cell: ({ getValue }) => numberFormat(getValue() as number),
   },
   {
     accessorKey: "remaining",
-    header: "Left",
+    header: "موجودی",
     cell: ({ getValue }) => numberFormat(getValue() as number),
   },
   {
     accessorKey: "imageKey",
+    header: "نمایش",
     cell: ({ getValue }) => (
       <Dialog>
         <DialogTrigger asChild>
-          <ZoomIn className="cursor-pointer" size={16} />
+          <Image className="cursor-pointer" size={16} />
         </DialogTrigger>
-        <DialogContent></DialogContent>
+        <DialogContent>
+          <p>Content Goes Here</p>
+          <DialogFooter className="flex">
+            <p className="bg-gray-700">Footer</p>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
     ),
   },
@@ -110,34 +119,36 @@ function RouteComponent() {
     getCoreRowModel: getCoreRowModel(),
   })
   return (
-    <Table className="w-full sm:max-w-md mx-auto mt-8">
-      <TableHeader>
-        {table.getHeaderGroups().map((group) => (
-          <TableRow key={group.id}>
-            {group.headers.map((header) => (
-              <TableHead key={header.id}>
-                {header.isPlaceholder
-                  ? null
-                  : flexRender(
-                      header.column.columnDef.header,
-                      header.getContext(),
-                    )}
-              </TableHead>
-            ))}
-          </TableRow>
-        ))}
-      </TableHeader>
-      <TableBody>
-        {table.getCoreRowModel().rows.map((row) => (
-          <TableRow key={row.id}>
-            {row.getVisibleCells().map((cell) => (
-              <TableCell key={cell.id}>
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </TableCell>
-            ))}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <div style={{ direction: "rtl" }}>
+      <Table className="w-full sm:max-w-md mx-auto mt-8">
+        <TableHeader>
+          {table.getHeaderGroups().map((group) => (
+            <TableRow key={group.id}>
+              {group.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getCoreRowModel().rows.map((row) => (
+            <TableRow key={row.id}>
+              {row.getVisibleCells().map((cell) => (
+                <TableCell key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   )
 }
