@@ -6,6 +6,8 @@ import {
   IconListDetails,
 } from "@tabler/icons-react"
 import { getSessionFN } from "@/fns"
+import { useQuery } from "@tanstack/react-query"
+import { createServerFn } from "@tanstack/react-start"
 
 export const Route = createFileRoute("/dashboard")({
   component: RouteComponent,
@@ -45,7 +47,9 @@ function RouteComponent() {
           <span className="font-medium">All Cards</span>{" "}
         </Link>
       </div>
-
+      {data?.map((alph) => (
+        <p key={alph}>{alph}</p>
+      ))}
       <Outlet />
     </div>
   )

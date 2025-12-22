@@ -21,6 +21,7 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { useQuery } from "@tanstack/react-query"
 
 type Purchase = {
   cardId: string
@@ -119,6 +120,7 @@ function RouteComponent() {
     data,
     getCoreRowModel: getCoreRowModel(),
   })
+
   return (
     <div style={{ direction: "rtl" }}>
       <Table className="w-full sm:max-w-lg mx-auto mt-8">
