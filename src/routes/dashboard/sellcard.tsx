@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useCardForm } from "@/hooks/manage.card.hook"
+import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import z from "zod"
 
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/dashboard/sellcard")({
 })
 
 const schema = z.object({
+  cardId: z.string().min(3),
   orderAt: z.date(),
   quantity: z.int().min(1),
   price: z.number().min(1000),
@@ -22,6 +24,7 @@ const schema = z.object({
 function RouteComponent() {
   const form = useCardForm({
     defaultValues: {
+      cardId: "",
       orderAt: new Date(),
       quantity: 0,
       price: 0,
@@ -33,6 +36,10 @@ function RouteComponent() {
     onSubmit(props) {
       console.log({ submittedValues: props.value })
     },
+  })
+  const { data: allCardIds, isFetching } = useQuery({
+    queryKey: ["all-cards"],
+    queryFn: () => Promise.resolve(["AL428", "H1314", "M499"]),
   })
   return (
     <Card className="mt-4 shadow-xl rounded-lg w-full sm:max-w-md mx-auto">
@@ -49,6 +56,14 @@ function RouteComponent() {
             form.handleSubmit()
           }}
         >
+          <form.AppField name="cardId">
+            {(field) => (
+              <field.ComboInput
+                label={isFetching ? "Loading..." : "Card ID"}
+                items={allCardIds || []}
+              />
+            )}
+          </form.AppField>
           <form.AppField name="orderAt">
             {(field) => (
               <div className="flex justify-center">

@@ -1,5 +1,5 @@
 import { useStore } from "@tanstack/react-form"
-import { Activity, useRef } from "react"
+import { Activity, useEffect, useRef, useState } from "react"
 import { Label } from "./ui/label"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
@@ -10,6 +10,15 @@ import { useFieldContext, useFormContext } from "@/hooks/manage.cad.context"
 import { cn } from "@/lib/utils"
 import { Calendar } from "./ui/calendar"
 import { format } from "date-fns-jalali"
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "./ui/command"
 
 function ErrorMessages({
   errors,
@@ -27,6 +36,46 @@ function ErrorMessages({
         </div>
       ))}
     </>
+  )
+}
+type ComboInputProps = {
+  items: Array<string>
+  label: string
+}
+export function ComboInput({ items, label }: ComboInputProps) {
+  const [buttonLabel, setButtonLabel] = useState(label)
+  const field = useFieldContext<string>()
+  const [open, setOpen] = useState(false)
+  useEffect(() => {
+    setButtonLabel(label)
+  }, [label])
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant={"outline"}>{buttonLabel}</Button>
+      </PopoverTrigger>
+      <PopoverContent>
+        <Command>
+          <CommandInput placeholder="search for card id" />
+          <CommandEmpty>Card ID Not Found!</CommandEmpty>
+          <CommandList>
+            {items.map((item) => (
+              <CommandItem
+                key={item}
+                value={item}
+                onSelect={(e) => {
+                  field.handleChange(e)
+                  setOpen(false)
+                  setButtonLabel(e)
+                }}
+              >
+                {item}
+              </CommandItem>
+            ))}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }
 
