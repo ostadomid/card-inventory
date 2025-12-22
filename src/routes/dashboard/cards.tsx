@@ -46,7 +46,11 @@ const columns: Array<ColumnDef<Purchase>> = [
     accessorKey: "purchaseDate",
     header: "تاریخ خرید",
     cell(props) {
-      return <span>{format(props.getValue() as string, "yyyy-MM-dd")}</span>
+      return (
+        <span className="tracking-wide">
+          {format(props.getValue() as string, "yyyy/MM/dd")}
+        </span>
+      )
     },
   },
   {
@@ -79,9 +83,6 @@ const columns: Array<ColumnDef<Purchase>> = [
         </DialogTrigger>
         <DialogContent>
           <p>Content Goes Here</p>
-          <DialogFooter className="flex">
-            <p className="bg-gray-700">Footer</p>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     ),
@@ -120,12 +121,12 @@ function RouteComponent() {
   })
   return (
     <div style={{ direction: "rtl" }}>
-      <Table className="w-full sm:max-w-md mx-auto mt-8">
+      <Table className="w-full sm:max-w-lg mx-auto mt-8">
         <TableHeader>
           {table.getHeaderGroups().map((group) => (
             <TableRow key={group.id}>
               {group.headers.map((header) => (
-                <TableHead key={header.id}>
+                <TableHead key={header.id} className="text-start">
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -141,7 +142,7 @@ function RouteComponent() {
           {table.getCoreRowModel().rows.map((row) => (
             <TableRow key={row.id}>
               {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
+                <TableCell key={cell.id} className="font-medium">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
               ))}

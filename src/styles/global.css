@@ -2,7 +2,25 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-
+@font-face {
+  font-family: "Vazirmatn";
+  src:
+    url("fonts/webfonts/Vazirmatn[wght].woff2")
+      format("woff2 supports variations"),
+    url("fonts/webfonts/Vazirmatn[wght].woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@theme {
+  --vazir: "Vazirmatn";
+  --default-font-feature-settings: "tnum", "ss01";
+}
+@layer base {
+  body * {
+    font-family: var(--vazir);
+  }
+}
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
