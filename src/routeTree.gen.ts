@@ -14,6 +14,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardSellcardRouteImport } from './routes/dashboard/sellcard'
 import { Route as DashboardCardsRouteImport } from './routes/dashboard/cards'
 import { Route as DashboardAddphotoRouteImport } from './routes/dashboard/addphoto'
 import { Route as DashboardAddcardRouteImport } from './routes/dashboard/addcard'
@@ -44,6 +45,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardSellcardRoute = DashboardSellcardRouteImport.update({
+  id: '/sellcard',
+  path: '/sellcard',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardCardsRoute = DashboardCardsRouteImport.update({
   id: '/cards',
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/addcard': typeof DashboardAddcardRoute
   '/dashboard/addphoto': typeof DashboardAddphotoRoute
   '/dashboard/cards': typeof DashboardCardsRoute
+  '/dashboard/sellcard': typeof DashboardSellcardRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/dashboard/addcard': typeof DashboardAddcardRoute
   '/dashboard/addphoto': typeof DashboardAddphotoRoute
   '/dashboard/cards': typeof DashboardCardsRoute
+  '/dashboard/sellcard': typeof DashboardSellcardRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/dashboard/addcard': typeof DashboardAddcardRoute
   '/dashboard/addphoto': typeof DashboardAddphotoRoute
   '/dashboard/cards': typeof DashboardCardsRoute
+  '/dashboard/sellcard': typeof DashboardSellcardRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/dashboard/addcard'
     | '/dashboard/addphoto'
     | '/dashboard/cards'
+    | '/dashboard/sellcard'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/dashboard/addcard'
     | '/dashboard/addphoto'
     | '/dashboard/cards'
+    | '/dashboard/sellcard'
     | '/api/auth/$'
   id:
     | '__root__'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/dashboard/addcard'
     | '/dashboard/addphoto'
     | '/dashboard/cards'
+    | '/dashboard/sellcard'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
@@ -194,6 +206,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/sellcard': {
+      id: '/dashboard/sellcard'
+      path: '/sellcard'
+      fullPath: '/dashboard/sellcard'
+      preLoaderRoute: typeof DashboardSellcardRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/cards': {
       id: '/dashboard/cards'
       path: '/cards'
@@ -236,12 +255,14 @@ interface DashboardRouteRouteChildren {
   DashboardAddcardRoute: typeof DashboardAddcardRoute
   DashboardAddphotoRoute: typeof DashboardAddphotoRoute
   DashboardCardsRoute: typeof DashboardCardsRoute
+  DashboardSellcardRoute: typeof DashboardSellcardRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAddcardRoute: DashboardAddcardRoute,
   DashboardAddphotoRoute: DashboardAddphotoRoute,
   DashboardCardsRoute: DashboardCardsRoute,
+  DashboardSellcardRoute: DashboardSellcardRoute,
 }
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(

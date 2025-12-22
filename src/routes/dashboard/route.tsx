@@ -31,7 +31,7 @@ function RouteComponent() {
           <span className="font-medium">Buy Cards</span>
         </Link>
         <Link
-          to="/test"
+          to="/dashboard/sellcard"
           className="w-20 rounded-lg aspect-square flex flex-col justify-center items-center  hover:bg-amber-500 transform transition-colors ease-in-out duration-150"
         >
           {/* <ShoppingCart size={32} /> */}
@@ -47,9 +47,6 @@ function RouteComponent() {
           <span className="font-medium">All Cards</span>{" "}
         </Link>
       </div>
-      {data?.map((alph) => (
-        <p key={alph}>{alph}</p>
-      ))}
       <Outlet />
     </div>
   )

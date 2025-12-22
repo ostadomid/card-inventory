@@ -8,6 +8,8 @@ import { Field, FieldError, FieldLabel } from "./ui/field"
 import type { UploadHookControl } from "@better-upload/client"
 import { useFieldContext, useFormContext } from "@/hooks/manage.cad.context"
 import { cn } from "@/lib/utils"
+import { Calendar } from "./ui/calendar"
+import { format } from "date-fns-jalali"
 
 function ErrorMessages({
   errors,
@@ -25,6 +27,25 @@ function ErrorMessages({
         </div>
       ))}
     </>
+  )
+}
+
+export function CalendarInput() {
+  const field = useFieldContext<Date | undefined>()
+  return (
+    <Calendar
+      mode="single"
+      formatters={{
+        formatWeekdayName(weekday, options, dateLib) {
+          return format(weekday, "EEEEE")
+        },
+      }}
+      onDayBlur={field.handleBlur}
+      selected={field.state.value}
+      onSelect={(e) => {
+        field.handleChange(e)
+      }}
+    />
   )
 }
 
@@ -82,7 +103,6 @@ export function Submit({
     s.isFieldsValid,
     s.isSubmitting,
   ])
-  console.log({ store: form.state })
   return (
     <Button
       disabled={!isFormValid}
