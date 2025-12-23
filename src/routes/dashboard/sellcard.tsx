@@ -39,27 +39,19 @@ const getCardIDs = createServerFn({ method: "GET" }).handler(async () => {
 const putNewOrder = createServerFn({ method: "POST" })
   .inputValidator(serverSchema)
   .handler(async ({ data }) => {
-    const availableRows = await db
+    const availableRows = db
       .select({ id: purchases.id, remaining: purchases.remaining })
       .from(purchases)
       .where(and(eq(purchases.cardId, data.cardId), gt(purchases.remaining, 0)))
       .orderBy(purchases.purchaseDate)
+      .all()
+    db.transaction((tx) => {
+      const { lastInsertRowid } = tx.insert(orders).values(data).run()
+      const allocated = 0
+      while (allocated < data.price) {}
+    })
 
     return availableRows
-    // const result = db.transaction( (tx) => {
-
-    //   // const id = (await tx.insert(orders).values(data)).lastInsertRowid
-    //   // const availableRows = await db
-    //   //   .select({ id: purchases.id, remaining: purchases.remaining })
-    //   //   .from(purchases)
-    //   //   .where(
-    //   //     and(eq(purchases.cardId, data.cardId), gt(purchases.remaining, 0)),
-    //   //   )
-    //   //   .orderBy(purchases.purchaseDate)
-    //   // const allocated = 0
-    //   // while (allocated < data.price) {}
-    // })
-    // return result
   })
 
 export const Route = createFileRoute("/dashboard/sellcard")({
