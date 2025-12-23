@@ -1,5 +1,5 @@
 import { useStore } from "@tanstack/react-form"
-import { Activity, useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { Label } from "./ui/label"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
@@ -19,6 +19,7 @@ import {
   CommandItem,
   CommandList,
 } from "./ui/command"
+import { useQuery } from "@tanstack/react-query"
 
 function ErrorMessages({
   errors,
@@ -39,39 +40,58 @@ function ErrorMessages({
   )
 }
 type ComboInputProps = {
-  items: Array<string>
   label: string
+  items: Array<string> | (() => Promise<Array<string>>)
 }
-export function ComboInput({ items, label }: ComboInputProps) {
-  const [buttonLabel, setButtonLabel] = useState(label)
+export function ComboInput({ label, items }: ComboInputProps) {
+  // const [buttonLabel, setButtonLabel] = useState(label)
   const field = useFieldContext<string>()
+
   const [open, setOpen] = useState(false)
-  useEffect(() => {
-    setButtonLabel(label)
-  }, [label])
+  const { data, isFetching } = useQuery({
+    queryKey: [`${field.name}-items`],
+    queryFn: async () => {
+      if (typeof items === "function") {
+        return await items()
+      } else if (Array.isArray(items)) {
+        return items
+      }
+      return ["Invalid Data Provided"]
+    },
+  })
+  // useEffect(() => {
+  //   setButtonLabel(label)
+  // }, [label])
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant={"outline"}>{buttonLabel}</Button>
+        <Button variant={"outline"}>
+          {isFetching
+            ? "Loading..."
+            : field.state.value.length > 0
+              ? field.state.value
+              : label}
+        </Button>
       </PopoverTrigger>
       <PopoverContent>
         <Command>
           <CommandInput placeholder="search for card id" />
           <CommandEmpty>Card ID Not Found!</CommandEmpty>
           <CommandList>
-            {items.map((item) => (
-              <CommandItem
-                key={item}
-                value={item}
-                onSelect={(e) => {
-                  field.handleChange(e)
-                  setOpen(false)
-                  setButtonLabel(e)
-                }}
-              >
-                {item}
-              </CommandItem>
-            ))}
+            <CommandGroup>
+              {data?.map((item) => (
+                <CommandItem
+                  key={item}
+                  value={item}
+                  onSelect={(e) => {
+                    field.handleChange(e)
+                    setOpen(false)
+                  }}
+                >
+                  {item}
+                </CommandItem>
+              ))}
+            </CommandGroup>
           </CommandList>
         </Command>
       </PopoverContent>
@@ -85,7 +105,7 @@ export function CalendarInput() {
     <Calendar
       mode="single"
       formatters={{
-        formatWeekdayName(weekday, options, dateLib) {
+        formatWeekdayName(weekday) {
           return format(weekday, "EEEEE")
         },
       }}

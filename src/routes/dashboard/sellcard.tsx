@@ -5,10 +5,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { db } from "@/db"
+import { purchases } from "@/db/schema"
 import { useCardForm } from "@/hooks/manage.card.hook"
-import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
+import { createServerFn } from "@tanstack/react-start"
+import { gt } from "drizzle-orm"
 import z from "zod"
+
+const getCardIDs = createServerFn({ method: "GET" }).handler(async () => {
+  const result = await db
+    .selectDistinct({ cardId: purchases.cardId })
+    .from(purchases)
+    .where(gt(purchases.remaining, 0))
+  return result.map((e) => e.cardId)
+})
 
 export const Route = createFileRoute("/dashboard/sellcard")({
   component: RouteComponent,
@@ -37,10 +48,7 @@ function RouteComponent() {
       console.log({ submittedValues: props.value })
     },
   })
-  const { data: allCardIds, isFetching } = useQuery({
-    queryKey: ["all-cards"],
-    queryFn: () => Promise.resolve(["AL428", "H1314", "M499"]),
-  })
+
   return (
     <Card className="mt-4 shadow-xl rounded-lg w-full sm:max-w-md mx-auto">
       <CardHeader>
@@ -58,10 +66,7 @@ function RouteComponent() {
         >
           <form.AppField name="cardId">
             {(field) => (
-              <field.ComboInput
-                label={isFetching ? "Loading..." : "Card ID"}
-                items={allCardIds || []}
-              />
+              <field.ComboInput label="Select a card" items={getCardIDs} />
             )}
           </form.AppField>
           <form.AppField name="orderAt">
