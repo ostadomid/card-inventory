@@ -76,10 +76,7 @@ const putNewOrder = createServerFn({ method: "POST" })
       0,
     )
     if (data.quantity > totalAvailableQuantity) {
-      throw {
-        ok: false,
-        error: `موجودی انبار (${totalAvailableQuantity}) کافی نیست`,
-      }
+      throw new Error(`موجودی انبار (${totalAvailableQuantity}) کافی نیست`)
     }
     db.transaction((tx) => {
       const { lastInsertRowid: orderId } = tx.insert(orders).values(data).run()
@@ -139,22 +136,24 @@ function RouteComponent() {
           console.log({ result })
         })
         .catch((err) => {
-          toast.error((err as PutOrderError).message, {
+          toast.error((err as Error).message, {
             position: "top-center",
+            style: { direction: "rtl" },
           })
         })
     },
   })
   const selectedCardId = useStore(form.store, (s) => s.values.cardId)
-  const { data: fetchedPrice } = useQuery({
+  useQuery({
     queryKey: ["cardId", selectedCardId],
-    queryFn: () => getCardPrice({ data: { cardId: selectedCardId } }),
-    initialData: 0,
+    queryFn: async () => {
+      const price = await getCardPrice({ data: { cardId: selectedCardId } })
+      form.setFieldValue("price", price)
+      return price
+    },
+    staleTime: Infinity,
     enabled: !!selectedCardId,
   })
-  useEffect(() => {
-    form.setFieldValue("price", fetchedPrice)
-  }, [fetchedPrice, form])
 
   return (
     <Card className="mt-4 shadow-xl rounded-lg w-full sm:max-w-md mx-auto">
