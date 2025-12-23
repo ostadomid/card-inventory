@@ -35,6 +35,7 @@ export const orders = sqliteTable('orders', {
     .default(sql`(unixepoch())`),
   quantity: integer(),
   price: integer(),
+  preparationPrice:integer(),
 })
 
 

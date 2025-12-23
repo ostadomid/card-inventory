@@ -174,7 +174,7 @@ export function Submit({
   ])
   return (
     <Button
-      disabled={!isFormValid}
+      // disabled={!isFormValid}
       type="submit"
       form={formId}
       className="block mx-auto disabled:bg-gray-400"
