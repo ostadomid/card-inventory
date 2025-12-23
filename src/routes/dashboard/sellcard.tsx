@@ -6,13 +6,22 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { db } from "@/db"
-import { orders, purchases } from "@/db/schema"
+import { allocations, orders, purchases } from "@/db/schema"
 import { useCardForm } from "@/hooks/manage.card.hook"
-import { useMutation } from "@tanstack/react-query"
+import { useStore } from "@tanstack/react-form"
+import { useDebouncedCallback } from "@tanstack/react-pacer"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { createServerFn } from "@tanstack/react-start"
-import { and, eq, gt } from "drizzle-orm"
+import { and, desc, eq, gt, sql } from "drizzle-orm"
+import { useEffect } from "react"
+import { toast } from "sonner"
 import z from "zod"
+
+type PutOrderError = {
+  ok: boolean
+  message: string
+}
 
 const schema = z.object({
   cardId: z.string().min(3),
@@ -36,22 +45,66 @@ const getCardIDs = createServerFn({ method: "GET" }).handler(async () => {
   return result.map((e) => e.cardId)
 })
 
+const getPriceSchema = z.object({ cardId: z.string().min(3) })
+const getCardPrice = createServerFn()
+  .inputValidator(getPriceSchema)
+  .handler(({ data: { cardId } }) => {
+    const result = db
+      .select({ price: purchases.sellingPrice })
+      .from(purchases)
+      .where(and(eq(purchases.cardId, cardId), gt(purchases.remaining, 0)))
+      .orderBy(desc(purchases.purchaseDate))
+      .get()
+    return result?.price || 0
+  })
+
 const putNewOrder = createServerFn({ method: "POST" })
   .inputValidator(serverSchema)
   .handler(async ({ data }) => {
     const availableRows = db
-      .select({ id: purchases.id, remaining: purchases.remaining })
+      .select({
+        id: purchases.id,
+        remaining: purchases.remaining,
+        sellingPrice: purchases.sellingPrice,
+      })
       .from(purchases)
       .where(and(eq(purchases.cardId, data.cardId), gt(purchases.remaining, 0)))
       .orderBy(purchases.purchaseDate)
       .all()
+    const totalAvailableQuantity = availableRows.reduce(
+      (acc, cur) => acc + (cur.remaining ?? 0),
+      0,
+    )
+    if (data.quantity > totalAvailableQuantity) {
+      throw {
+        ok: false,
+        error: `موجودی انبار (${totalAvailableQuantity}) کافی نیست`,
+      }
+    }
     db.transaction((tx) => {
-      const { lastInsertRowid } = tx.insert(orders).values(data).run()
-      const allocated = 0
-      while (allocated < data.price) {}
+      const { lastInsertRowid: orderId } = tx.insert(orders).values(data).run()
+      let allocated = 0
+      let current = 0
+      while (allocated < data.price && current < availableRows.length) {
+        const row = availableRows[current++]
+        const taken = Math.min(data.quantity - allocated, row.remaining!)
+        allocated += taken
+        tx.insert(allocations)
+          .values({
+            orderId: Number(orderId),
+            purchaseId: row.id,
+            sellingPrice: row.sellingPrice,
+            quantity: taken,
+          })
+          .run()
+        tx.update(purchases)
+          .set({ remaining: sql`remaining - ${taken}` })
+          .where(eq(purchases.id, row.id))
+          .run()
+      }
     })
 
-    return availableRows
+    return { ok: true, message: "Order put successfully" }
   })
 
 export const Route = createFileRoute("/dashboard/sellcard")({
@@ -72,20 +125,36 @@ function RouteComponent() {
     defaultValues: {
       cardId: "",
       orderAt: new Date(),
-      quantity: 0,
-      price: 0,
-      preparationPrice: 0,
+      quantity: 100,
+      price: 1000,
+      preparationPrice: 300000,
     },
     validators: {
       onBlur: schema,
       onChange: schema,
     },
     onSubmit(props) {
-      mutateAsync(props.value).then((result) => {
-        console.log({ result })
-      })
+      mutateAsync(props.value)
+        .then((result) => {
+          console.log({ result })
+        })
+        .catch((err) => {
+          toast.error((err as PutOrderError).message, {
+            position: "top-center",
+          })
+        })
     },
   })
+  const selectedCardId = useStore(form.store, (s) => s.values.cardId)
+  const { data: fetchedPrice } = useQuery({
+    queryKey: ["cardId", selectedCardId],
+    queryFn: () => getCardPrice({ data: { cardId: selectedCardId } }),
+    initialData: 0,
+    enabled: !!selectedCardId,
+  })
+  useEffect(() => {
+    form.setFieldValue("price", fetchedPrice)
+  }, [fetchedPrice, form])
 
   return (
     <Card className="mt-4 shadow-xl rounded-lg w-full sm:max-w-md mx-auto">
