@@ -59,62 +59,73 @@ export function ComboInput({ label, items }: ComboInputProps) {
       return ["Invalid Data Provided"]
     },
   })
-  // useEffect(() => {
-  //   setButtonLabel(label)
-  // }, [label])
+  const errors = useStore(
+    field.store,
+    (s) => s.meta.errorMap.onChange || s.meta.errorMap.onBlur,
+  )
+  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button variant={"outline"}>
-          {isFetching
-            ? "Loading..."
-            : field.state.value.length > 0
-              ? field.state.value
-              : label}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent>
-        <Command>
-          <CommandInput placeholder="search for card id" />
-          <CommandEmpty>Card ID Not Found!</CommandEmpty>
-          <CommandList>
-            <CommandGroup>
-              {data?.map((item) => (
-                <CommandItem
-                  key={item}
-                  value={item}
-                  onSelect={(e) => {
-                    field.handleChange(e)
-                    setOpen(false)
-                  }}
-                >
-                  {item}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+    <Field data-invalid={isInvalid}>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button variant={"outline"}>
+            {isFetching
+              ? "Loading..."
+              : field.state.value.length > 0
+                ? field.state.value
+                : label}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent>
+          <Command>
+            <CommandInput placeholder="search for card id" />
+            <CommandEmpty>Card ID Not Found!</CommandEmpty>
+            <CommandList>
+              <CommandGroup>
+                {data?.map((item) => (
+                  <CommandItem
+                    key={item}
+                    value={item}
+                    onBlur={field.handleBlur}
+                    onSelect={(e) => {
+                      field.handleChange(e)
+                      setOpen(false)
+                    }}
+                  >
+                    {item}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+      <FieldError errors={errors} />
+    </Field>
   )
 }
 
 export function CalendarInput() {
   const field = useFieldContext<Date | undefined>()
+  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
   return (
-    <Calendar
-      mode="single"
-      formatters={{
-        formatWeekdayName(weekday) {
-          return format(weekday, "EEEEE")
-        },
-      }}
-      onDayBlur={field.handleBlur}
-      selected={field.state.value}
-      onSelect={(e) => {
-        field.handleChange(e)
-      }}
-    />
+    <Field data-invalid={isInvalid}>
+      <Calendar
+        mode="single"
+        formatters={{
+          formatWeekdayName(weekday) {
+            return format(weekday, "EEEEE")
+          },
+        }}
+        onDayBlur={field.handleBlur}
+        selected={field.state.value}
+        onSelect={(e) => {
+          field.handleChange(e)
+        }}
+        aria-invalid={isInvalid}
+      />
+    </Field>
   )
 }
 
@@ -122,11 +133,13 @@ type InputProps = {
   label: string
   numeric?: boolean
   password?: boolean
+  readonly?: boolean
 }
 export function TextInput({
   label,
   numeric = false,
   password = false,
+  readonly = false,
 }: InputProps) {
   const field = useFieldContext<string | number>()
   const errors = useStore(field.store, (s) => s.meta.errorMap.onChange)
@@ -138,6 +151,7 @@ export function TextInput({
         <span>{label}</span>
         <Input
           type={numeric ? "number" : password ? "password" : "text"}
+          readOnly={readonly}
           value={field.state.value}
           onBlur={field.handleBlur}
           onChange={(e) =>

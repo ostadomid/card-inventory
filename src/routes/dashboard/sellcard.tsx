@@ -13,6 +13,7 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { createServerFn } from "@tanstack/react-start"
 import { and, desc, eq, gt, sql } from "drizzle-orm"
+import { useEffect } from "react"
 import { toast } from "sonner"
 import z from "zod"
 
@@ -142,16 +143,19 @@ function RouteComponent() {
   })
   const selectedCardId = useStore(form.store, (s) => s.values.cardId)
 
-  useQuery({
+  const { data: fetchedPrice } = useQuery({
     queryKey: ["cardId", selectedCardId],
     queryFn: async () => {
       const price = await getCardPrice({ data: { cardId: selectedCardId } })
-      form.setFieldValue("price", price)
       return price
     },
     staleTime: Infinity,
     enabled: !!selectedCardId,
   })
+  useEffect(() => {
+    if (!fetchedPrice) return
+    form.setFieldValue("price", fetchedPrice)
+  }, [fetchedPrice])
 
   return (
     <Card className="mt-4 shadow-xl rounded-lg w-full sm:max-w-md mx-auto">
@@ -174,18 +178,14 @@ function RouteComponent() {
             )}
           </form.AppField>
           <form.AppField name="orderAt">
-            {(field) => (
-              <div className="flex justify-center">
-                <field.CalendarInput />
-              </div>
-            )}
+            {(field) => <field.CalendarInput />}
           </form.AppField>
           <form.AppField name="quantity">
             {(field) => <field.TextInput label="Quantity" numeric />}
           </form.AppField>
           <div className="flex justify-between gap-4">
             <form.AppField name="price">
-              {(field) => <field.TextInput label="Price" numeric />}
+              {(field) => <field.TextInput label="Price" numeric readonly />}
             </form.AppField>
             <form.AppField name="preparationPrice">
               {(field) => <field.TextInput label="Preparation Price" numeric />}
