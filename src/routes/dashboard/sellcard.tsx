@@ -9,19 +9,12 @@ import { db } from "@/db"
 import { allocations, orders, purchases } from "@/db/schema"
 import { useCardForm } from "@/hooks/manage.card.hook"
 import { useStore } from "@tanstack/react-form"
-import { useDebouncedCallback } from "@tanstack/react-pacer"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { createServerFn } from "@tanstack/react-start"
 import { and, desc, eq, gt, sql } from "drizzle-orm"
-import { useEffect } from "react"
 import { toast } from "sonner"
 import z from "zod"
-
-type PutOrderError = {
-  ok: boolean
-  message: string
-}
 
 const schema = z.object({
   cardId: z.string().min(3),
@@ -133,7 +126,11 @@ function RouteComponent() {
     onSubmit(props) {
       mutateAsync(props.value)
         .then((result) => {
-          console.log({ result })
+          toast.success(result.message, {
+            position: "top-center",
+            style: { direction: "rtl" },
+          })
+          form.reset()
         })
         .catch((err) => {
           toast.error((err as Error).message, {
@@ -144,6 +141,7 @@ function RouteComponent() {
     },
   })
   const selectedCardId = useStore(form.store, (s) => s.values.cardId)
+
   useQuery({
     queryKey: ["cardId", selectedCardId],
     queryFn: async () => {
