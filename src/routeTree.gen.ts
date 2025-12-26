@@ -12,10 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestRouteImport } from './routes/test'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as FieldRouteImport } from './routes/field'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardSellcardRouteImport } from './routes/dashboard/sellcard'
-import { Route as DashboardCardsRouteImport } from './routes/dashboard/cards'
+import { Route as DashboardPurchasehistoryRouteImport } from './routes/dashboard/purchasehistory'
+import { Route as DashboardCardslistRouteImport } from './routes/dashboard/cardslist'
 import { Route as DashboardAddphotoRouteImport } from './routes/dashboard/addphoto'
 import { Route as DashboardAddcardRouteImport } from './routes/dashboard/addcard'
 import { Route as ApiUploadRouteImport } from './routes/api/upload'
@@ -36,6 +38,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FieldRoute = FieldRouteImport.update({
+  id: '/field',
+  path: '/field',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRouteRoute = DashboardRouteRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -51,9 +58,15 @@ const DashboardSellcardRoute = DashboardSellcardRouteImport.update({
   path: '/sellcard',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardCardsRoute = DashboardCardsRouteImport.update({
-  id: '/cards',
-  path: '/cards',
+const DashboardPurchasehistoryRoute =
+  DashboardPurchasehistoryRouteImport.update({
+    id: '/purchasehistory',
+    path: '/purchasehistory',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
+const DashboardCardslistRoute = DashboardCardslistRouteImport.update({
+  id: '/cardslist',
+  path: '/cardslist',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardAddphotoRoute = DashboardAddphotoRouteImport.update({
@@ -80,26 +93,30 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/field': typeof FieldRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/test': typeof TestRoute
   '/api/upload': typeof ApiUploadRoute
   '/dashboard/addcard': typeof DashboardAddcardRoute
   '/dashboard/addphoto': typeof DashboardAddphotoRoute
-  '/dashboard/cards': typeof DashboardCardsRoute
+  '/dashboard/cardslist': typeof DashboardCardslistRoute
+  '/dashboard/purchasehistory': typeof DashboardPurchasehistoryRoute
   '/dashboard/sellcard': typeof DashboardSellcardRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/field': typeof FieldRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/test': typeof TestRoute
   '/api/upload': typeof ApiUploadRoute
   '/dashboard/addcard': typeof DashboardAddcardRoute
   '/dashboard/addphoto': typeof DashboardAddphotoRoute
-  '/dashboard/cards': typeof DashboardCardsRoute
+  '/dashboard/cardslist': typeof DashboardCardslistRoute
+  '/dashboard/purchasehistory': typeof DashboardPurchasehistoryRoute
   '/dashboard/sellcard': typeof DashboardSellcardRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -107,13 +124,15 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/field': typeof FieldRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/test': typeof TestRoute
   '/api/upload': typeof ApiUploadRoute
   '/dashboard/addcard': typeof DashboardAddcardRoute
   '/dashboard/addphoto': typeof DashboardAddphotoRoute
-  '/dashboard/cards': typeof DashboardCardsRoute
+  '/dashboard/cardslist': typeof DashboardCardslistRoute
+  '/dashboard/purchasehistory': typeof DashboardPurchasehistoryRoute
   '/dashboard/sellcard': typeof DashboardSellcardRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -122,39 +141,45 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/field'
     | '/login'
     | '/signup'
     | '/test'
     | '/api/upload'
     | '/dashboard/addcard'
     | '/dashboard/addphoto'
-    | '/dashboard/cards'
+    | '/dashboard/cardslist'
+    | '/dashboard/purchasehistory'
     | '/dashboard/sellcard'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
+    | '/field'
     | '/login'
     | '/signup'
     | '/test'
     | '/api/upload'
     | '/dashboard/addcard'
     | '/dashboard/addphoto'
-    | '/dashboard/cards'
+    | '/dashboard/cardslist'
+    | '/dashboard/purchasehistory'
     | '/dashboard/sellcard'
     | '/api/auth/$'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
+    | '/field'
     | '/login'
     | '/signup'
     | '/test'
     | '/api/upload'
     | '/dashboard/addcard'
     | '/dashboard/addphoto'
-    | '/dashboard/cards'
+    | '/dashboard/cardslist'
+    | '/dashboard/purchasehistory'
     | '/dashboard/sellcard'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
@@ -162,6 +187,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
+  FieldRoute: typeof FieldRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
   TestRoute: typeof TestRoute
@@ -192,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/field': {
+      id: '/field'
+      path: '/field'
+      fullPath: '/field'
+      preLoaderRoute: typeof FieldRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -213,11 +246,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSellcardRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/dashboard/cards': {
-      id: '/dashboard/cards'
-      path: '/cards'
-      fullPath: '/dashboard/cards'
-      preLoaderRoute: typeof DashboardCardsRouteImport
+    '/dashboard/purchasehistory': {
+      id: '/dashboard/purchasehistory'
+      path: '/purchasehistory'
+      fullPath: '/dashboard/purchasehistory'
+      preLoaderRoute: typeof DashboardPurchasehistoryRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/cardslist': {
+      id: '/dashboard/cardslist'
+      path: '/cardslist'
+      fullPath: '/dashboard/cardslist'
+      preLoaderRoute: typeof DashboardCardslistRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/addphoto': {
@@ -254,14 +294,16 @@ declare module '@tanstack/react-router' {
 interface DashboardRouteRouteChildren {
   DashboardAddcardRoute: typeof DashboardAddcardRoute
   DashboardAddphotoRoute: typeof DashboardAddphotoRoute
-  DashboardCardsRoute: typeof DashboardCardsRoute
+  DashboardCardslistRoute: typeof DashboardCardslistRoute
+  DashboardPurchasehistoryRoute: typeof DashboardPurchasehistoryRoute
   DashboardSellcardRoute: typeof DashboardSellcardRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAddcardRoute: DashboardAddcardRoute,
   DashboardAddphotoRoute: DashboardAddphotoRoute,
-  DashboardCardsRoute: DashboardCardsRoute,
+  DashboardCardslistRoute: DashboardCardslistRoute,
+  DashboardPurchasehistoryRoute: DashboardPurchasehistoryRoute,
   DashboardSellcardRoute: DashboardSellcardRoute,
 }
 
@@ -272,6 +314,7 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
+  FieldRoute: FieldRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
   TestRoute: TestRoute,

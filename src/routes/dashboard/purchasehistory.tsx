@@ -90,7 +90,7 @@ const columns: Array<ColumnDef<Purchase>> = [
   },
 ]
 
-export const Route = createFileRoute("/dashboard/cards")({
+export const Route = createFileRoute("/dashboard/purchasehistory")({
   component: RouteComponent,
 })
 

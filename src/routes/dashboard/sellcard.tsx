@@ -98,11 +98,16 @@ const putNewOrder = createServerFn({ method: "POST" })
     return { ok: true, message: "Order put successfully" }
   })
 
+const searchSchema = z.object({
+  cardId: z.string().min(3).optional(),
+})
 export const Route = createFileRoute("/dashboard/sellcard")({
   component: RouteComponent,
+  validateSearch: searchSchema,
 })
 
 function RouteComponent() {
+  const { cardId } = Route.useSearch()
   const { mutateAsync } = useMutation({
     mutationFn: async (data: PutOrder) => {
       const result = await putNewOrder({
@@ -114,7 +119,7 @@ function RouteComponent() {
 
   const form = useCardForm({
     defaultValues: {
-      cardId: "",
+      cardId: cardId || "",
       orderAt: new Date(),
       quantity: 100,
       price: 1000,

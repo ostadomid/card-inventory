@@ -1,6 +1,13 @@
 import { Link, Outlet, createFileRoute, redirect } from "@tanstack/react-router"
 import { ArrowBigDownDash, ClipboardList, ShoppingCart } from "lucide-react"
 import {
+  ClockCounterClockwiseIcon,
+  SquaresFourIcon,
+  StackMinusIcon,
+  StackPlus,
+  StackPlusIcon,
+} from "@phosphor-icons/react"
+import {
   IconBasketDown,
   IconBasketUp,
   IconListDetails,
@@ -26,25 +33,32 @@ function RouteComponent() {
           to="/dashboard/addcard"
           className="w-20 rounded-lg aspect-square flex flex-col justify-center items-center hover:bg-amber-500 transform transition-colors ease-in-out duration-150"
         >
-          {/* <ArrowBigDownDash size={24} /> */}
-          <IconBasketDown size={32} />
+          {/* <IconBasketDown size={32} /> */}
+          <StackPlusIcon size={32} />
           <span className="font-medium">Buy Cards</span>
         </Link>
         <Link
           to="/dashboard/sellcard"
           className="w-20 rounded-lg aspect-square flex flex-col justify-center items-center  hover:bg-amber-500 transform transition-colors ease-in-out duration-150"
         >
-          {/* <ShoppingCart size={32} /> */}
-          <IconBasketUp size={32} />
+          {/* <IconBasketUp size={32} /> */}
+          <StackMinusIcon size={32} />
           <span className="font-medium">Sell Cards</span>{" "}
         </Link>
         <Link
-          to="/dashboard/cards"
+          to="/dashboard/purchasehistory"
           className="w-20 rounded-lg aspect-square flex flex-col justify-center items-center  hover:bg-amber-500 transform transition-colors ease-in-out duration-150"
         >
           {/* <ClipboardList size={32} /> */}
-          <IconListDetails size={32} />
-          <span className="font-medium">All Cards</span>{" "}
+          <ClockCounterClockwiseIcon size={32} />
+          <span className="font-medium">Purchases</span>{" "}
+        </Link>
+        <Link
+          to="/dashboard/cardslist"
+          className="w-20 rounded-lg aspect-square flex flex-col justify-center items-center  hover:bg-amber-500 transform transition-colors ease-in-out duration-150"
+        >
+          <SquaresFourIcon size={32} />
+          <span className="font-medium">Cards</span>{" "}
         </Link>
       </div>
       <Outlet />
