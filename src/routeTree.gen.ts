@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestRouteImport } from './routes/test'
+import { Route as TableRouteImport } from './routes/table'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FieldRouteImport } from './routes/field'
@@ -26,6 +27,11 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 const TestRoute = TestRouteImport.update({
   id: '/test',
   path: '/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TableRoute = TableRouteImport.update({
+  id: '/table',
+  path: '/table',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignupRoute = SignupRouteImport.update({
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/field': typeof FieldRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/table': typeof TableRoute
   '/test': typeof TestRoute
   '/api/upload': typeof ApiUploadRoute
   '/dashboard/addcard': typeof DashboardAddcardRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/field': typeof FieldRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/table': typeof TableRoute
   '/test': typeof TestRoute
   '/api/upload': typeof ApiUploadRoute
   '/dashboard/addcard': typeof DashboardAddcardRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/field': typeof FieldRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/table': typeof TableRoute
   '/test': typeof TestRoute
   '/api/upload': typeof ApiUploadRoute
   '/dashboard/addcard': typeof DashboardAddcardRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/field'
     | '/login'
     | '/signup'
+    | '/table'
     | '/test'
     | '/api/upload'
     | '/dashboard/addcard'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/field'
     | '/login'
     | '/signup'
+    | '/table'
     | '/test'
     | '/api/upload'
     | '/dashboard/addcard'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/field'
     | '/login'
     | '/signup'
+    | '/table'
     | '/test'
     | '/api/upload'
     | '/dashboard/addcard'
@@ -190,6 +202,7 @@ export interface RootRouteChildren {
   FieldRoute: typeof FieldRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
+  TableRoute: typeof TableRoute
   TestRoute: typeof TestRoute
   ApiUploadRoute: typeof ApiUploadRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -202,6 +215,13 @@ declare module '@tanstack/react-router' {
       path: '/test'
       fullPath: '/test'
       preLoaderRoute: typeof TestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/table': {
+      id: '/table'
+      path: '/table'
+      fullPath: '/table'
+      preLoaderRoute: typeof TableRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signup': {
@@ -317,6 +337,7 @@ const rootRouteChildren: RootRouteChildren = {
   FieldRoute: FieldRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
+  TableRoute: TableRoute,
   TestRoute: TestRoute,
   ApiUploadRoute: ApiUploadRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
