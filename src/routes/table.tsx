@@ -9,7 +9,13 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import {
   Table,
   TableBody,
@@ -25,8 +31,9 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group"
-import { Search } from "lucide-react"
+import { ArrowLeft, ArrowRight, Search } from "lucide-react"
 import { useDebouncedCallback } from "@tanstack/react-pacer"
+import { usePaginate } from "@/hooks/usePaginate"
 
 export const Route = createFileRoute("/table")({
   component: RouteComponent,
@@ -71,6 +78,11 @@ function RouteComponent() {
     },
     { wait: 500 },
   )
+  const { render, nextPage, prevPage } = usePaginate({
+    totalItems: 65,
+    pageSize: 5,
+    len: 5,
+  })
   return (
     <Card className="w-full sm:max-w-md mx-auto mt-4 shadow-lg">
       <CardHeader>
@@ -137,6 +149,16 @@ function RouteComponent() {
               </Button>
             ))}
         </div>
+
+        <CardFooter>
+          <Button onClick={prevPage}>
+            <ArrowLeft />
+          </Button>
+          <Button onClick={nextPage}>
+            <ArrowRight />
+          </Button>
+        </CardFooter>
+        <div>{render}</div>
       </CardContent>
     </Card>
   )
