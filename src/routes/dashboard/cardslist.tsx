@@ -14,6 +14,7 @@ import {
   ItemActions,
 } from "@/components/ui/item"
 import { Item } from "@/components/ui/item"
+import { StackIcon } from "@phosphor-icons/react"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { DollarSign, Sigma } from "lucide-react"
 
@@ -66,7 +67,7 @@ function RouteComponent() {
                 </Item>
                 <Item variant="muted" size={"sm"}>
                   <ItemMedia variant={"icon"}>
-                    <Sigma />
+                    <StackIcon />
                   </ItemMedia>
                   <ItemContent>{quantity}</ItemContent>
                 </Item>
@@ -83,7 +84,9 @@ function RouteComponent() {
                 className="hover:bg-green-300/50"
                 asChild
               >
-                <Link to={"/dashboard/sellcard"}>خرید</Link>
+                <Link to={"/dashboard/addcard"} search={{ cardId }}>
+                  خرید
+                </Link>
               </Button>
             </ItemActions>
           </Item>

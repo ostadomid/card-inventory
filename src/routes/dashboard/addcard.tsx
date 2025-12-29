@@ -48,8 +48,12 @@ const getCardQuantity = createServerFn()
     return { quantity: r[0]?.sum || 0, rows: r[0]?.rows || 0 }
   })
 
+const searchSchema = z.object({
+  cardId: z.string().min(3).optional(),
+})
 export const Route = createFileRoute("/dashboard/addcard")({
   component: RouteComponent,
+  validateSearch: searchSchema,
 })
 
 type CardInfo = {
@@ -58,18 +62,19 @@ type CardInfo = {
 }
 
 function RouteComponent() {
+  const { cardId } = Route.useSearch()
   const uploader = useUploadFile({ route: "cards" })
+
   const form = useCardForm({
     defaultValues: {
-      cardId: "",
+      cardId: cardId || "",
       quantity: 50,
       price: 1000,
       sellingPrice: 2000,
       image: new File([], "dummy"),
     },
     validators: {
-      onBlur: schema,
-      onChange: schema,
+      onSubmit: schema,
     },
     onSubmit(props) {
       uploader.uploadAsync(props.value.image).then((res) => {

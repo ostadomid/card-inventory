@@ -1,20 +1,11 @@
 import { Link, Outlet, createFileRoute, redirect } from "@tanstack/react-router"
-import { ArrowBigDownDash, ClipboardList, ShoppingCart } from "lucide-react"
 import {
   ClockCounterClockwiseIcon,
   SquaresFourIcon,
   StackMinusIcon,
-  StackPlus,
   StackPlusIcon,
 } from "@phosphor-icons/react"
-import {
-  IconBasketDown,
-  IconBasketUp,
-  IconListDetails,
-} from "@tabler/icons-react"
 import { getSessionFN } from "@/fns"
-import { useQuery } from "@tanstack/react-query"
-import { createServerFn } from "@tanstack/react-start"
 
 export const Route = createFileRoute("/dashboard")({
   component: RouteComponent,
