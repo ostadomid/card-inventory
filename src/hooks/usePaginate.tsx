@@ -1,58 +1,65 @@
-import { useCallback, useState } from "react"
+import { useMemo, useState } from "react"
+import { chunk, take, last, takeRight } from "es-toolkit"
 
 type Props = {
-  count: number
+  totalItems: number
   pageSize: number
-  threshold?: number
+  len?: number
 }
-export function usePaginate({ count, pageSize, threshold = 5 }: Props) {
+function where(pageNo: number, frameLength: number, totalPages: number) {
+  const isMiddle =
+    Math.ceil(pageNo / frameLength) > 1 &&
+    Math.ceil(pageNo / frameLength) < Math.ceil(totalPages / frameLength)
+  const isHead = pageNo == 1
+  const isTail =
+    Math.ceil(pageNo / frameLength) == Math.ceil(totalPages / frameLength)
+  return { isHead, isMiddle, isTail }
+}
+export function usePaginate({ totalItems, pageSize, len = 5 }: Props) {
   const [currentPage, setCurrentPage] = useState(1)
-  const nextPage = useCallback(() => {
-    setCurrentPage((old) => Math.min(old + 1, Math.ceil(count / pageSize)))
-  }, [setCurrentPage, count, pageSize])
+  const totalpages = Math.ceil(totalItems / pageSize)
+  const frameLength = Math.min(totalpages, len)
+  const frames = useMemo(
+    () =>
+      chunk(
+        Array.from({ length: totalpages }, (_, idx) => idx + 1),
+        frameLength,
+      ),
+    [totalpages, frameLength],
+  )
 
-  const prevPage = useCallback(() => {
-    setCurrentPage((old) => Math.max(old - 1, 1))
-  }, [setCurrentPage])
+  let render: Array<unknown> = []
+  const mainFrameIdx = Math.ceil(currentPage / frameLength) - 1
+  //render.push(...frames[mainFrameIdx])
 
-  const totalPages = Math.ceil(count / pageSize)
-  const renderMinimal = totalPages <= threshold
-  const renderRangeStart = !renderMinimal && currentPage < threshold
-  const renderRangeEnd =
-    !renderMinimal && !renderRangeStart && totalPages - currentPage <= threshold
-  const renderMidRange = !renderMinimal && !renderRangeEnd
-  let render = [] as Array<string>
-  console.log({
-    totalPages,
-    renderMinimal,
-    renderRangeStart,
-    renderMidRange,
-    renderRangeEnd,
-  })
-
-  if (renderMinimal) {
-    render = ["1", "2", "3", "4", "5"]
-  }
-  if (renderRangeStart) {
+  //Left Margin of Frame
+  if (currentPage % frameLength === 1) {
+    const isFirstFrame = mainFrameIdx === 1
     render = [
-      "<",
-      ...Array(threshold)
-        .fill(0)
-        .map((e, i) => String(currentPage + i)),
+      ...take(
+        frames[mainFrameIdx],
+        isFirstFrame ? frameLength : frameLength - 1,
+      ),
     ]
+    if (!isFirstFrame) {
+      render = [last(frames[mainFrameIdx - 1]), ...render]
+    }
   }
-  if (renderRangeEnd) {
+  //Right Margin of Frame
+  else if (currentPage % frameLength === 0) {
+    const isLastFrame = mainFrameIdx === frames.length
     render = [
-      "<",
-      "1",
-      "2",
-      ...Array(threshold)
-        .fill(0)
-        .map((e, i) => String(currentPage + i)),
+      ...takeRight(
+        frames[mainFrameIdx],
+        isLastFrame ? frameLength : frameLength - 1,
+      ),
     ]
+    if (!isLastFrame) {
+      render = [frames[mainFrameIdx + 1][0], ...render]
+    }
   }
-  if (renderMidRange) {
-    render = ["<", "1", "2", "...", String(totalPages - 1), String(totalPages)]
+  //Mid Range of Frame
+  else {
+    render.push(frames[mainFrameIdx])
   }
-  return { nextPage, prevPage, currentPage, render }
 }
