@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { chunk, take, last, takeRight } from "es-toolkit"
+import { cn } from "@/lib/utils"
 
 type Props = {
   totalItems: number
@@ -28,13 +29,26 @@ export function usePaginate({ totalItems, pageSize, len = 5 }: Props) {
     [totalpages, frameLength],
   )
 
-  let render: Array<unknown> = []
+  const nextPage = useCallback(() => {
+    setCurrentPage((old) => Math.min(old + 1, totalpages))
+  }, [setCurrentPage, totalpages])
+  const prevPage = useCallback(() => {
+    setCurrentPage((old) => Math.max(1, old - 1))
+  }, [setCurrentPage])
+
+  console.log({
+    totalpages,
+    frames,
+    frameLength,
+  })
+
+  let render: Array<number> = []
   const mainFrameIdx = Math.ceil(currentPage / frameLength) - 1
   //render.push(...frames[mainFrameIdx])
 
   //Left Margin of Frame
   if (currentPage % frameLength === 1) {
-    const isFirstFrame = mainFrameIdx === 1
+    const isFirstFrame = mainFrameIdx === 0
     render = [
       ...take(
         frames[mainFrameIdx],
@@ -42,12 +56,12 @@ export function usePaginate({ totalItems, pageSize, len = 5 }: Props) {
       ),
     ]
     if (!isFirstFrame) {
-      render = [last(frames[mainFrameIdx - 1]), ...render]
+      render = [last(frames[mainFrameIdx - 1])!, ...render]
     }
   }
   //Right Margin of Frame
   else if (currentPage % frameLength === 0) {
-    const isLastFrame = mainFrameIdx === frames.length
+    const isLastFrame = mainFrameIdx === frames.length - 1
     render = [
       ...takeRight(
         frames[mainFrameIdx],
@@ -55,11 +69,22 @@ export function usePaginate({ totalItems, pageSize, len = 5 }: Props) {
       ),
     ]
     if (!isLastFrame) {
-      render = [frames[mainFrameIdx + 1][0], ...render]
+      render = [...render, frames[mainFrameIdx + 1][0]]
     }
   }
   //Mid Range of Frame
   else {
-    render.push(frames[mainFrameIdx])
+    render.push(...frames[mainFrameIdx])
+  }
+  return {
+    render: (
+      <div className="flex gap-2">
+        {render.map((e) => (
+          <p className={cn({ "text-red-700": e == currentPage })}>{e}</p>
+        ))}
+      </div>
+    ),
+    prevPage,
+    nextPage,
   }
 }
