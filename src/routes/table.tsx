@@ -78,11 +78,7 @@ function RouteComponent() {
     },
     { wait: 500 },
   )
-  const { render, nextPage, prevPage } = usePaginate({
-    totalItems: 65,
-    pageSize: 5,
-    len: 5,
-  })
+  const { render, nextPage, prevPage } = usePaginate({ totalPages: 5 })
   return (
     <Card className="w-full sm:max-w-md mx-auto mt-4 shadow-lg">
       <CardHeader>
