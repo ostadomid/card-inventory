@@ -88,3 +88,17 @@ export function usePaginate({ totalItems, pageSize, len = 5 }: Props) {
     nextPage,
   }
 }
+const { floor: lower, ceil: upper, min, max } = Math
+
+export function usePaginate2({
+  totalItems,
+  pageSize,
+}: {
+  totalItems: number
+  pageSize: number
+}) {
+  const totalPages = upper(totalItems / pageSize)
+  const frameLength = min(totalPages, 5)
+  const [left, setLeft] = useState(0)
+  const [right, setRight] = useState(max(frameLength - 1, 0))
+}
