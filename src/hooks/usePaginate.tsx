@@ -46,7 +46,7 @@ import { cn } from "@/lib/utils"
 //   const mainFrameIdx = Math.ceil(currentPage / frameLength) - 1
 //   //render.push(...frames[mainFrameIdx])
 
-//   //Left Margin of Frame
+//   //LeftIndex Margin of Frame
 //   if (currentPage % frameLength === 1) {
 //     const isFirstFrame = mainFrameIdx === 0
 //     render = [
@@ -136,5 +136,50 @@ export const usePaginate = ({ totalPages }: { totalPages: number }) => {
     ),
     nextPage,
     prevPage,
+  }
+}
+
+export const usePaginate3 = ({ totalPages }: { totalPages: number }) => {
+  const [currentPage, setCurrentPage] = useState(1)
+  const nextPage = useCallback(() => {
+    setCurrentPage((old) => min(totalPages, old + 1))
+  }, [setCurrentPage])
+  const prevPage = useCallback(() => {
+    setCurrentPage((old) => max(1, old - 1))
+  }, [setCurrentPage])
+
+  const position = currentPage % 5
+  const firstInFrame = (position: number) => position == 1
+  const lastInFrame = (position: number) => position == 0
+  const firstFrame = (frame: number) => frame == 1
+  const lastFrame = (frame: number) => frame == upper(totalPages / 5)
+  const frame = upper(currentPage / 5)
+  let leftIndex = (frame - 1) * 5
+  let rightIndex = min(leftIndex + 4, totalPages - 1)
+
+  if (firstInFrame(position) && !firstFrame(frame)) {
+    leftIndex = max(0, currentPage - 1 - 1)
+    rightIndex = min(totalPages - 1, leftIndex + 4 - 1)
+  }
+  if (lastInFrame(position) && !lastFrame(frame)) {
+    leftIndex = max(0, currentPage - 1)
+    rightIndex = min(totalPages - 1, leftIndex + 4 - 1)
+  }
+
+  return {
+    nextPage,
+    prevPage,
+    render: (
+      <div className="flex gap-2">
+        {Array.from(
+          { length: rightIndex - leftIndex + 1 },
+          (_, idx) => leftIndex + idx + 1,
+        ).map((e) => (
+          <p className={cn({ "text-red-700 font-black": e == currentPage })}>
+            {e}
+          </p>
+        ))}
+      </div>
+    ),
   }
 }
