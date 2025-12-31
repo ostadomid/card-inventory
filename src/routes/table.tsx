@@ -1,3 +1,4 @@
+import { A, O, pipe } from "@mobily/ts-belt"
 import { createFileRoute } from "@tanstack/react-router"
 import cities from "@/db/cities.json"
 import {
@@ -78,7 +79,8 @@ function RouteComponent() {
     },
     { wait: 500 },
   )
-  const { render, nextPage, prevPage } = usePaginate({ totalPages: 5 })
+  const { render, nextPage, prevPage } = usePaginate({ totalPages: 9 })
+
   return (
     <Card className="w-full sm:max-w-md mx-auto mt-4 shadow-lg">
       <CardHeader>
