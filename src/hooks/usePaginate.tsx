@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react"
-import { chunk, take, last, takeRight } from "es-toolkit"
+import { chunk, take, last, takeRight, windowed } from "es-toolkit"
 import { cn } from "@/lib/utils"
 
 // type Props = {
@@ -91,7 +91,7 @@ import { cn } from "@/lib/utils"
 
 const { floor: lower, ceil: upper, min, max } = Math
 
-export const usePaginate = ({ totalPages }: { totalPages: number }) => {
+export const usePaginate1 = ({ totalPages }: { totalPages: number }) => {
   const arr = useMemo(
     () => Array.from({ length: totalPages }, (_, idx) => idx + 1),
     [totalPages],
@@ -175,6 +175,39 @@ export const usePaginate3 = ({ totalPages }: { totalPages: number }) => {
           { length: rightIndex - leftIndex + 1 },
           (_, idx) => leftIndex + idx + 1,
         ).map((e) => (
+          <p className={cn({ "text-red-700 font-black": e == currentPage })}>
+            {e}
+          </p>
+        ))}
+      </div>
+    ),
+  }
+}
+
+const createArray = (length: number) =>
+  Array.from({ length: length }, (_, idx) => idx + 1)
+export const usePaginate = ({ totalPages }: { totalPages: number }) => {
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const nextPage = useCallback(() => {
+    setCurrentPage((old) => min(totalPages, old + 1))
+  }, [setCurrentPage])
+  const prevPage = useCallback(() => {
+    setCurrentPage((old) => max(1, old - 1))
+  }, [setCurrentPage])
+
+  const items = useMemo(() => {
+    const arr = createArray(totalPages)
+    return totalPages <= 5 ? [arr] : windowed(arr, 5, 5 - 2)
+  }, [totalPages])
+  console.log({ items })
+  const frameIndex = min(items.length - 1, lower(currentPage / 5))
+  return {
+    nextPage,
+    prevPage,
+    render: (
+      <div className="flex gap-2">
+        {items[frameIndex].map((e) => (
           <p className={cn({ "text-red-700 font-black": e == currentPage })}>
             {e}
           </p>
