@@ -186,6 +186,12 @@ export const usePaginate3 = ({ totalPages }: { totalPages: number }) => {
 
 const createArray = (length: number) =>
   Array.from({ length: length }, (_, idx) => idx + 1)
+const makeFrames = (array: Array<number | string>, frameSize: number) =>
+  array
+    .map((_, idx) =>
+      array.slice(idx * (frameSize - 2), idx * (frameSize - 2) + frameSize),
+    )
+    .filter((a) => a.length != 0)
 export const usePaginate = ({ totalPages }: { totalPages: number }) => {
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -198,7 +204,7 @@ export const usePaginate = ({ totalPages }: { totalPages: number }) => {
 
   const items = useMemo(() => {
     const arr = createArray(totalPages)
-    return totalPages <= 5 ? [arr] : windowed(arr, 5, 5 - 2)
+    return totalPages <= 5 ? [arr] : makeFrames(arr, 5)
   }, [totalPages])
   const flatItems = useMemo(() => items.flat(), [items])
 
@@ -221,5 +227,51 @@ export const usePaginate = ({ totalPages }: { totalPages: number }) => {
         ))}
       </div>
     ),
+  }
+}
+
+export const usePaginationGemini = ({ totalPages = 1, pageSize = 5 }) => {
+  const [currentPage, setCurrentPage] = useState(1)
+
+  // Helper to change page safely
+  const goToPage = (page: number) => {
+    const pageNumber = Math.max(1, Math.min(page, totalPages))
+    setCurrentPage(pageNumber)
+  }
+
+  const nextPage = () => goToPage(currentPage + 1)
+  const prevPage = () => goToPage(currentPage - 1)
+
+  // Calculate the specific numbers to show (Sliding Window)
+  const visiblePages = useMemo(() => {
+    // If total pages is less than size, show all
+    if (totalPages <= pageSize) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1)
+    }
+
+    // Calculate start/end to keep current page somewhat centered
+    let start = currentPage - Math.floor(pageSize / 2)
+
+    // Adjust if we are near the start
+    if (start < 1) {
+      start = 1
+    }
+
+    // Adjust if we are near the end
+    if (start + pageSize > totalPages) {
+      start = totalPages - pageSize + 1
+    }
+
+    return Array.from({ length: pageSize }, (_, i) => start + i)
+  }, [totalPages, pageSize, currentPage])
+
+  return {
+    currentPage,
+    visiblePages,
+    goToPage,
+    nextPage,
+    prevPage,
+    isFirst: currentPage === 1,
+    isLast: currentPage === totalPages,
   }
 }

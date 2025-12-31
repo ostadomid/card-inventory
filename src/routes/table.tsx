@@ -33,7 +33,8 @@ import {
 } from "@/components/ui/input-group"
 import { ArrowLeft, ArrowRight, Search } from "lucide-react"
 import { useDebouncedCallback } from "@tanstack/react-pacer"
-import { usePaginate } from "@/hooks/usePaginate"
+import { usePaginate, usePaginationGemini } from "@/hooks/usePaginate"
+import { cn } from "@/lib/utils"
 
 export const Route = createFileRoute("/table")({
   component: RouteComponent,
@@ -78,7 +79,17 @@ function RouteComponent() {
     },
     { wait: 500 },
   )
-  const { render, nextPage, prevPage } = usePaginate({ totalPages: 5 })
+  //const { render, nextPage, prevPage } = usePaginate({ totalPages: 9 })
+
+  const {
+    visiblePages,
+    currentPage,
+    goToPage,
+    nextPage,
+    prevPage,
+    isFirst,
+    isLast,
+  } = usePaginationGemini({ totalPages: 18 })
   return (
     <Card className="w-full sm:max-w-md mx-auto mt-4 shadow-lg">
       <CardHeader>
@@ -154,7 +165,36 @@ function RouteComponent() {
             <ArrowRight />
           </Button>
         </CardFooter>
-        <div>{render}</div>
+        {/* <div>{render}</div> */}
+        <div className="flex gap-2 items-center">
+          <button
+            onClick={prevPage}
+            disabled={isFirst}
+            className="disabled:opacity-50"
+          >
+            Prev
+          </button>
+
+          {visiblePages.map((page) => (
+            <button
+              key={page}
+              onClick={() => goToPage(page)}
+              className={cn("px-3 py-1 border rounded", {
+                "bg-red-700 text-white font-black": page === currentPage,
+              })}
+            >
+              {page}
+            </button>
+          ))}
+
+          <button
+            onClick={nextPage}
+            disabled={isLast}
+            className="disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </CardContent>
     </Card>
   )
