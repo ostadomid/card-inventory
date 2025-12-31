@@ -200,8 +200,15 @@ export const usePaginate = ({ totalPages }: { totalPages: number }) => {
     const arr = createArray(totalPages)
     return totalPages <= 5 ? [arr] : windowed(arr, 5, 5 - 2)
   }, [totalPages])
-  console.log({ items })
-  const frameIndex = min(items.length - 1, lower(currentPage / 5))
+  const flatItems = useMemo(() => items.flat(), [items])
+
+  const newCurrentPage = flatItems.findIndex((e) => e === currentPage) + 1
+  console.log({ currentPage, newCurrentPage, items, flatItems })
+  const frameIndex = min(
+    items.length - 1,
+    upper(newCurrentPage / 5) - 1 + (newCurrentPage % 5 == 0 ? 1 : 0),
+  )
+
   return {
     nextPage,
     prevPage,
