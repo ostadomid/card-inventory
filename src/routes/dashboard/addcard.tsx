@@ -14,7 +14,7 @@ import { useCardForm } from "@/hooks/manage.card.hook"
 import { Label } from "@/components/ui/label"
 
 const schema = z.object({
-  cardId: z.string().min(3),
+  cardId: z.string({ error: "required" }).min(3),
   quantity: z.number().min(1),
   price: z.number().min(1000),
   sellingPrice: z.number().min(1000),
@@ -68,12 +68,14 @@ function RouteComponent() {
   const form = useCardForm({
     defaultValues: {
       cardId: cardId || "",
-      quantity: 50,
-      price: 1000,
-      sellingPrice: 2000,
+      quantity: 0,
+      price: 0,
+      sellingPrice: 0,
       image: new File([], "dummy"),
     },
     validators: {
+      onBlur: schema,
+      onChange: schema,
       onSubmit: schema,
     },
     onSubmit(props) {

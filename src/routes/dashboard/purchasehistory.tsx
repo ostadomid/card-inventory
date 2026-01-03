@@ -1,12 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import {
+  createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
 import { format } from "date-fns-jalali"
-import { Image, ZoomIn } from "lucide-react"
-import type { ColumnDef } from "@tanstack/react-table"
+import { Image } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -18,12 +21,21 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { useQuery } from "@tanstack/react-query"
+import { createServerFn } from "@tanstack/react-start"
+import { db } from "@/db"
+import { purchases } from "@/db/schema"
+import { cn } from "@/lib/utils"
+import { Paginator } from "@/components/Paginator"
+import { ActionCell } from "@/components/ActionCell"
 
 type Purchase = {
+  id: number
   cardId: string
   purchaseDate: number
   price: number
@@ -35,90 +47,111 @@ type Purchase = {
 
 const numberFormat = (value: number) => Intl.NumberFormat("IR-fa").format(value)
 
-const columns: Array<ColumnDef<Purchase>> = [
-  {
-    accessorKey: "cardId",
+const hp = createColumnHelper<Purchase>()
+const columns = [
+  hp.display({
+    id: "operation",
+    cell(props) {
+      return (
+        <ActionCell
+          onEdit={(id) => {
+            props.table.options.meta?.navigate({
+              to: "/dashboard/editpurchase/$id",
+              params: { id: String(id) },
+            })
+          }}
+          onDelete={(id) =>
+            new Promise((res) => setTimeout(() => res(id), 1500))
+          }
+          id={props.row.original.id}
+        />
+      )
+    },
+  }),
+  hp.accessor("cardId", {
     header: "کد",
     cell(props) {
       return <span className="font-medium">{props.getValue() as string}</span>
     },
-  },
-  {
-    accessorKey: "purchaseDate",
-    header: "تاریخ خرید",
+  }),
+  hp.accessor("purchaseDate", {
+    header: "ت.خرید",
     cell(props) {
       return (
         <span className="tracking-wide">
-          {format(props.getValue() as string, "yyyy/MM/dd")}
+          {format(props.getValue(), "yyyy/MM/dd")}
         </span>
       )
     },
-  },
-  {
-    accessorKey: "quantity",
+  }),
+  hp.accessor("quantity", {
     header: "تعداد",
     cell: ({ getValue }) => numberFormat(getValue() as number),
-  },
-  {
-    accessorKey: "price",
-    header: "قیمت خرید",
+  }),
+  hp.accessor("price", {
+    header: "ق.خرید",
     cell: ({ getValue }) => numberFormat(getValue() as number),
-  },
-  {
-    accessorKey: "sellingPrice",
-    header: "قیمت فروش",
+  }),
+  hp.accessor("sellingPrice", {
+    header: "ق.فروش",
     cell: ({ getValue }) => numberFormat(getValue() as number),
-  },
-  {
-    accessorKey: "remaining",
+  }),
+  hp.accessor("remaining", {
     header: "موجودی",
     cell: ({ getValue }) => numberFormat(getValue() as number),
-  },
-  {
-    accessorKey: "imageKey",
-    header: "نمایش",
-    cell: ({ getValue }) => (
+  }),
+  hp.accessor("imageKey", {
+    enableSorting: false,
+    header: "",
+    cell: ({ getValue, row }) => (
       <Dialog>
         <DialogTrigger asChild>
           <Image className="cursor-pointer" size={16} />
         </DialogTrigger>
-        <DialogContent>
-          <p>Content Goes Here</p>
+        <DialogContent className="w-full sm:max-w-150">
+          <DialogHeader>
+            <DialogTitle>اطلاعات کارت</DialogTitle>
+            <DialogDescription>123</DialogDescription>
+          </DialogHeader>
+          <img
+            alt={`${row.getValue("cardId")}`}
+            src={`http:\\\\localhost:9000\\card-inventory\\${getValue()}`}
+          />
         </DialogContent>
       </Dialog>
     ),
-  },
+  }),
 ]
 
 export const Route = createFileRoute("/dashboard/purchasehistory")({
   component: RouteComponent,
 })
 
-const data: Array<Purchase> = [
-  {
-    cardId: "H1210",
-    purchaseDate: 1765617791,
-    price: 1000,
-    sellingPrice: 2000,
-    remaining: 1500,
-    quantity: 1500,
-    imageKey: "",
-  },
-  {
-    cardId: "AL440",
-    purchaseDate: 1766247464439,
-    price: 2700,
-    sellingPrice: 7500,
-    remaining: 300,
-    quantity: 300,
-    imageKey: "",
-  },
-]
+const getPurchases = createServerFn().handler(async () => {
+  // TODO: add authentication/authorization here
+  const result = db.select().from(purchases).all()
+  return result?.map((e) => ({ ...e, purchaseDate: e.purchaseDate.getTime() }))
+})
 function RouteComponent() {
+  const navigate = useNavigate()
+
+  const { data = [] } = useQuery({
+    queryKey: ["purchases"],
+    queryFn: getPurchases,
+  })
   const table = useReactTable({
     columns: columns,
     data,
+    initialState: {
+      pagination: {
+        pageSize: 15,
+      },
+    },
+    meta: { navigate },
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
   })
 
   return (
@@ -129,19 +162,33 @@ function RouteComponent() {
             <TableRow key={group.id}>
               {group.headers.map((header) => (
                 <TableHead key={header.id} className="text-start">
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
+                  {header.isPlaceholder ? null : (
+                    <div
+                      className={cn(
+                        {
+                          "cursor-pointer": header.column.getCanSort(),
+                        },
+                        "select-none",
+                      )}
+                      onClick={header.column.getToggleSortingHandler()}
+                    >
+                      {flexRender(
                         header.column.columnDef.header,
                         header.getContext(),
                       )}
+                      {{
+                        asc: " 🔼",
+                        desc: " 🔽",
+                      }[header.column.getIsSorted() as string] ?? null}
+                    </div>
+                  )}
                 </TableHead>
               ))}
             </TableRow>
           ))}
         </TableHeader>
         <TableBody>
-          {table.getCoreRowModel().rows.map((row) => (
+          {table.getRowModel().rows.map((row) => (
             <TableRow key={row.id}>
               {row.getVisibleCells().map((cell) => (
                 <TableCell key={cell.id} className="font-medium">
@@ -152,6 +199,12 @@ function RouteComponent() {
           ))}
         </TableBody>
       </Table>
+      <div style={{ direction: "ltr" }} className="my-4">
+        <Paginator
+          totalPages={table.getPageCount()}
+          onChange={(page) => table.setPageIndex(page - 1)}
+        />
+      </div>
     </div>
   )
 }

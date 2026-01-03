@@ -142,8 +142,11 @@ export function TextInput({
   readonly = false,
 }: InputProps) {
   const field = useFieldContext<string | number>()
-  const errors = useStore(field.store, (s) => s.meta.errorMap.onChange)
-  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+  const errors = useStore(field.store, (s) => s.meta.errors)
+  const isInvalid = useStore(
+    field.store,
+    (s) => s.meta.isTouched && !s.meta.isValid,
+  )
 
   return (
     <div className="space-y-2">
@@ -152,6 +155,7 @@ export function TextInput({
         <Input
           type={numeric ? "number" : password ? "password" : "text"}
           readOnly={readonly}
+          name={field.name}
           value={field.state.value}
           onBlur={field.handleBlur}
           onChange={(e) =>
@@ -162,7 +166,7 @@ export function TextInput({
           data-has-error={errors?.length > 0}
         />
       </Label>
-      {isInvalid && <ErrorMessages errors={errors} />}
+      {isInvalid && <FieldError errors={errors} />}
       {/* {field.state.meta.isTouched && errors && errors.length > 0 && (
         <ul className="text-red-600">
           {errors.map((err, idx) => (
@@ -182,13 +186,14 @@ export function Submit({
   formId?: string
 }) {
   const form = useFormContext()
-  const [isFormValid, isSubmitting] = useStore(form.store, (s) => [
+  const [isFormValid, isSubmitting, canSubmit] = useStore(form.store, (s) => [
     s.isFieldsValid,
     s.isSubmitting,
+    s.canSubmit,
   ])
   return (
     <Button
-      // disabled={!isFormValid}
+      disabled={!canSubmit}
       type="submit"
       form={formId}
       className="block mx-auto disabled:bg-gray-400"
@@ -200,17 +205,37 @@ export function Submit({
 
 type FileUploaderProps = {
   control: UploadHookControl<false>
+  imageKey?: string
 }
-export function FileUploader({ control }: FileUploaderProps) {
+export function FileUploader({ control, imageKey }: FileUploaderProps) {
   const preview = useRef(null)
-  const field = useFieldContext<File>()
+  const field = useFieldContext<File | undefined | null>()
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
-  const size = useStore(field.store, (s) => s.value.size)
+  const size = useStore(field.store, (s) => s.value?.size || 0)
   // const badSize = field.state.value.size
   return (
     <Field data-invalid={isInvalid}>
       <FieldLabel htmlFor="photo-uploader">Card Photo</FieldLabel>
-      <img alt="preview" ref={preview} className={cn({ hidden: size <= 0 })} />
+      <img
+        alt="preview"
+        src={
+          imageKey
+            ? `http://localhost:9000/card-inventory/${imageKey}`
+            : undefined
+        }
+        ref={preview}
+        className={cn({ hidden: !imageKey && size <= 0 })}
+        onLoad={(e) => {
+          // const img = e.target as HTMLImageElement
+          // const canvas = document.createElement("canvas")
+          // canvas.height = img.naturalHeight
+          // canvas.width = img.naturalWidth
+          // canvas.getContext("2d")?.drawImage(img, 0, 0)
+          // canvas.toBlob((blob) => {
+          //   field.setValue(new File(blob ? [blob] : [], "alaki.png"))
+          // })
+        }}
+      />
 
       <UploadButton
         id="photo-uploader"

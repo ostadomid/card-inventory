@@ -7,17 +7,16 @@ import type { Router } from "@better-upload/server"
 const router: Router = {
   bucketName: "card-inventory",
   client: minio({
-    region:"us-east-1",
-    endpoint:"http://localhost:9000",
-     accessKeyId: process.env.ACCESS_KEY||"",
-     secretAccessKey: process.env.SECRET_KEY||"",
+    region: "us-east-1",
+    endpoint: "http://localhost:9000",
+    accessKeyId: process.env.ACCESS_KEY || "",
+    secretAccessKey: process.env.SECRET_KEY || "",
   }),
 
   routes: {
     cards: route({
       fileTypes: ["image/*"],
       maxFileSize: 35 * 1024 * 1024,
-      
     }),
   },
 }

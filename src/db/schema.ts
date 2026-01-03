@@ -1,20 +1,20 @@
-import { relations, sql } from 'drizzle-orm'
-import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { relations, sql } from "drizzle-orm"
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 
-export const purchases = sqliteTable('purchases', {
-  id: integer({ mode: 'number' }).primaryKey({ autoIncrement: true }),
+export const purchases = sqliteTable("purchases", {
+  id: integer({ mode: "number" }).primaryKey({ autoIncrement: true }),
   cardId: text().notNull(),
-  purchaseDate: integer('purchase_date', { mode: 'timestamp' }).default(
-    sql`(unixepoch())`,
-  ),
-  price: integer(),
-  sellingPrice:integer("selling_price"),
-  quantity: integer(),
-  remaining: integer(),
-  imageKey: text("image_key")
+  purchaseDate: integer("purchase_date", { mode: "timestamp" })
+    .default(sql`(unixepoch())`)
+    .notNull(),
+  price: integer().notNull(),
+  sellingPrice: integer("selling_price").notNull(),
+  quantity: integer().notNull(),
+  remaining: integer().notNull(),
+  imageKey: text("image_key").notNull(),
 })
 
-export const allocations = sqliteTable('allocations', {
+export const allocations = sqliteTable("allocations", {
   id: integer().primaryKey({ autoIncrement: true }),
   orderId: integer()
     .notNull()
@@ -22,22 +22,21 @@ export const allocations = sqliteTable('allocations', {
   purchaseId: integer()
     .notNull()
     .references(() => purchases.id),
-  allocatedAt: integer('allocated_at', { mode: 'timestamp' })
+  allocatedAt: integer("allocated_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(unixepoch())`),
   quantity: integer(),
-  sellingPrice:integer("selling_price")
+  sellingPrice: integer("selling_price"),
 })
-export const orders = sqliteTable('orders', {
-  id: integer({ mode: 'number' }).primaryKey({ autoIncrement: true }),
-  orderedAt: integer('ordered_at', { mode: 'timestamp' })
+export const orders = sqliteTable("orders", {
+  id: integer({ mode: "number" }).primaryKey({ autoIncrement: true }),
+  orderedAt: integer("ordered_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(unixepoch())`),
   quantity: integer(),
   price: integer(),
-  preparationPrice:integer(),
+  preparationPrice: integer(),
 })
-
 
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
@@ -54,7 +53,7 @@ export const user = sqliteTable("user", {
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
-});
+})
 
 export const session = sqliteTable(
   "session",
@@ -75,7 +74,7 @@ export const session = sqliteTable(
       .references(() => user.id, { onDelete: "cascade" }),
   },
   (table) => [index("session_userId_idx").on(table.userId)],
-);
+)
 
 export const account = sqliteTable(
   "account",
@@ -105,7 +104,7 @@ export const account = sqliteTable(
       .notNull(),
   },
   (table) => [index("account_userId_idx").on(table.userId)],
-);
+)
 
 export const verification = sqliteTable(
   "verification",
@@ -123,24 +122,23 @@ export const verification = sqliteTable(
       .notNull(),
   },
   (table) => [index("verification_identifier_idx").on(table.identifier)],
-);
+)
 
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
-}));
+}))
 
 export const sessionRelations = relations(session, ({ one }) => ({
   user: one(user, {
     fields: [session.userId],
     references: [user.id],
   }),
-}));
+}))
 
 export const accountRelations = relations(account, ({ one }) => ({
   user: one(user, {
     fields: [account.userId],
     references: [user.id],
   }),
-}));
-
+}))

@@ -22,6 +22,7 @@ import { Route as DashboardCardslistRouteImport } from './routes/dashboard/cards
 import { Route as DashboardAddphotoRouteImport } from './routes/dashboard/addphoto'
 import { Route as DashboardAddcardRouteImport } from './routes/dashboard/addcard'
 import { Route as ApiUploadRouteImport } from './routes/api/upload'
+import { Route as DashboardEditpurchaseIdRouteImport } from './routes/dashboard/editpurchase/$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const TestRoute = TestRouteImport.update({
@@ -90,6 +91,11 @@ const ApiUploadRoute = ApiUploadRouteImport.update({
   path: '/api/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardEditpurchaseIdRoute = DashboardEditpurchaseIdRouteImport.update({
+  id: '/editpurchase/$id',
+  path: '/editpurchase/$id',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/purchasehistory': typeof DashboardPurchasehistoryRoute
   '/dashboard/sellcard': typeof DashboardSellcardRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/dashboard/editpurchase/$id': typeof DashboardEditpurchaseIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByTo {
   '/dashboard/purchasehistory': typeof DashboardPurchasehistoryRoute
   '/dashboard/sellcard': typeof DashboardSellcardRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/dashboard/editpurchase/$id': typeof DashboardEditpurchaseIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -144,6 +152,7 @@ export interface FileRoutesById {
   '/dashboard/purchasehistory': typeof DashboardPurchasehistoryRoute
   '/dashboard/sellcard': typeof DashboardSellcardRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/dashboard/editpurchase/$id': typeof DashboardEditpurchaseIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -162,6 +171,7 @@ export interface FileRouteTypes {
     | '/dashboard/purchasehistory'
     | '/dashboard/sellcard'
     | '/api/auth/$'
+    | '/dashboard/editpurchase/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/dashboard/purchasehistory'
     | '/dashboard/sellcard'
     | '/api/auth/$'
+    | '/dashboard/editpurchase/$id'
   id:
     | '__root__'
     | '/'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/dashboard/purchasehistory'
     | '/dashboard/sellcard'
     | '/api/auth/$'
+    | '/dashboard/editpurchase/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -301,6 +313,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/editpurchase/$id': {
+      id: '/dashboard/editpurchase/$id'
+      path: '/editpurchase/$id'
+      fullPath: '/dashboard/editpurchase/$id'
+      preLoaderRoute: typeof DashboardEditpurchaseIdRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -317,6 +336,7 @@ interface DashboardRouteRouteChildren {
   DashboardCardslistRoute: typeof DashboardCardslistRoute
   DashboardPurchasehistoryRoute: typeof DashboardPurchasehistoryRoute
   DashboardSellcardRoute: typeof DashboardSellcardRoute
+  DashboardEditpurchaseIdRoute: typeof DashboardEditpurchaseIdRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
@@ -325,6 +345,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardCardslistRoute: DashboardCardslistRoute,
   DashboardPurchasehistoryRoute: DashboardPurchasehistoryRoute,
   DashboardSellcardRoute: DashboardSellcardRoute,
+  DashboardEditpurchaseIdRoute: DashboardEditpurchaseIdRoute,
 }
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(

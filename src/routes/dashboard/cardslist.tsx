@@ -16,6 +16,7 @@ import {
 import { Item } from "@/components/ui/item"
 import { StackIcon } from "@phosphor-icons/react"
 import { createFileRoute, Link } from "@tanstack/react-router"
+import { createColumnHelper } from "@tanstack/react-table"
 import { DollarSign, Sigma } from "lucide-react"
 
 export const Route = createFileRoute("/dashboard/cardslist")({
