@@ -31,15 +31,18 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const items = useMemo<Array<Menu>>(
     () => [
-      { title: "Home", icon: Home, to: "/" },
-      { title: "Dashboard", icon: Cog, to: "/dashboard" },
+      { title: "خانه", icon: Home, to: "/" },
+      { title: "مدیریت", icon: Cog, to: "/dashboard" },
     ],
     [],
   )
 
   return (
     <>
-      <header className="p-4 flex items-center bg-gray-800 text-white shadow-lg">
+      <header
+        style={{ direction: "rtl" }}
+        className="p-4 flex items-center bg-gray-800 text-white shadow-lg"
+      >
         <button
           onClick={() => setIsOpen(true)}
           className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
@@ -47,7 +50,7 @@ export default function Header() {
         >
           <Menu size={24} />
         </button>
-        <h1 className="ml-4 text-xl font-semibold">
+        <h1 className="ms-4 text-xl font-semibold">
           <Link to="/">
             <img
               src="/tanstack-word-logo-white.svg"
@@ -59,7 +62,7 @@ export default function Header() {
         <Activity mode={data ? "visible" : "hidden"}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className="ml-auto cursor-pointer hover:bg-purple-700">
+              <Button className="ms-auto cursor-pointer hover:bg-purple-700">
                 <IconUserCircle /> {data?.user.name}
               </Button>
             </DropdownMenuTrigger>
@@ -86,12 +89,12 @@ export default function Header() {
       </header>
 
       <aside
-        className={`fixed top-0 left-0 h-full w-80 bg-gray-900 text-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed top-0 right-0 h-full w-80 bg-gray-900 text-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
+          isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <h2 className="text-xl font-bold">Navigation</h2>
+          <h2 className="text-xl mx-auto font-bold">ناوبری</h2>
           <button
             onClick={() => setIsOpen(false)}
             className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
@@ -108,10 +111,10 @@ export default function Header() {
               onClick={() => setIsOpen(false)}
               to={to}
               activeProps={{ className: "bg-blue-600" }}
-              className="transition-colors rounded-lg hover:bg-gray-600 flex gap-4 p-4 mb-2"
+              className="transition-colors rounded-lg hover:bg-gray-600 flex justify-end gap-4 p-4 mb-2"
             >
-              <Icon size={24} />
               <span className="font-medium">{title}</span>
+              <Icon size={24} />
             </Link>
           ))}
         </nav>

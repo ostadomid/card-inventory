@@ -18,23 +18,26 @@ export const Route = createFileRoute("/dashboard")({
 
 function RouteComponent() {
   return (
-    <div className="bg-slate-50 h-[calc(100vh-72px)] flex flex-col">
-      <div className="flex justify-between gap-4 max-w-md mx-auto space-x-4 rounded-b-lg bg-amber-300 p-2 h-8 hover:h-24 transform transition-all ease-in-out duration-150">
-        <Link
-          to="/dashboard/addcard"
-          className="w-20 rounded-lg aspect-square flex flex-col justify-center items-center hover:bg-amber-500 transform transition-colors ease-in-out duration-150"
-        >
-          {/* <IconBasketDown size={32} /> */}
-          <StackPlusIcon size={32} />
-          <span className="font-medium">Buy Cards</span>
-        </Link>
+    <div
+      style={{ direction: "rtl" }}
+      className="bg-slate-50 h-[calc(100vh-72px)] flex flex-col"
+    >
+      <div className="flex justify-between gap-4 w-full sm:max-w-md mx-auto space-x-4 rounded-b-lg bg-amber-300 p-2 h-24 sm:h-8 sm:hover:h-24 transform transition-all ease-in-out duration-150">
         <Link
           to="/dashboard/sellcard"
           className="w-20 rounded-lg aspect-square flex flex-col justify-center items-center  hover:bg-amber-500 transform transition-colors ease-in-out duration-150"
         >
           {/* <IconBasketUp size={32} /> */}
           <StackMinusIcon size={32} />
-          <span className="font-medium">Sell Cards</span>{" "}
+          <span className="font-medium">فروش</span>{" "}
+        </Link>
+        <Link
+          to="/dashboard/addcard"
+          className="w-20 rounded-lg aspect-square flex flex-col justify-center items-center hover:bg-amber-500 transform transition-colors ease-in-out duration-150"
+        >
+          {/* <IconBasketDown size={32} /> */}
+          <StackPlusIcon size={32} />
+          <span className="font-medium">خرید</span>
         </Link>
         <Link
           to="/dashboard/purchasehistory"
@@ -42,14 +45,14 @@ function RouteComponent() {
         >
           {/* <ClipboardList size={32} /> */}
           <ClockCounterClockwiseIcon size={32} />
-          <span className="font-medium">Purchases</span>{" "}
+          <span className="font-medium">سابقه خرید</span>{" "}
         </Link>
         <Link
           to="/dashboard/cardslist"
           className="w-20 rounded-lg aspect-square flex flex-col justify-center items-center  hover:bg-amber-500 transform transition-colors ease-in-out duration-150"
         >
           <SquaresFourIcon size={32} />
-          <span className="font-medium">Cards</span>{" "}
+          <span className="font-medium">کارتها</span>{" "}
         </Link>
       </div>
       <Outlet />

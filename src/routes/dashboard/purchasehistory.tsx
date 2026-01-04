@@ -9,7 +9,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import { format } from "date-fns-jalali"
-import { Image } from "lucide-react"
+import { Image, Search } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -33,6 +33,13 @@ import { purchases } from "@/db/schema"
 import { cn } from "@/lib/utils"
 import { Paginator } from "@/components/Paginator"
 import { ActionCell } from "@/components/ActionCell"
+import { Field } from "@/components/ui/field"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group"
+import { useDebouncedCallback } from "@tanstack/react-pacer"
 
 type Purchase = {
   id: number
@@ -153,58 +160,74 @@ function RouteComponent() {
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   })
+  const applyFilter = useDebouncedCallback(
+    (filter) => table.setColumnFilters([{ id: "cardId", value: filter }]),
+    { wait: 500 },
+  )
 
   return (
-    <div style={{ direction: "rtl" }}>
-      <Table className="w-full sm:max-w-lg mx-auto mt-8">
-        <TableHeader>
-          {table.getHeaderGroups().map((group) => (
-            <TableRow key={group.id}>
-              {group.headers.map((header) => (
-                <TableHead key={header.id} className="text-start">
-                  {header.isPlaceholder ? null : (
-                    <div
-                      className={cn(
-                        {
-                          "cursor-pointer": header.column.getCanSort(),
-                        },
-                        "select-none",
-                      )}
-                      onClick={header.column.getToggleSortingHandler()}
-                    >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                      {{
-                        asc: " 🔼",
-                        desc: " 🔽",
-                      }[header.column.getIsSorted() as string] ?? null}
-                    </div>
-                  )}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id} className="font-medium">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <div style={{ direction: "ltr" }} className="my-4">
-        <Paginator
-          totalPages={table.getPageCount()}
-          onChange={(page) => table.setPageIndex(page - 1)}
+    <>
+      <InputGroup className="w-full sm:max-w-lg mx-auto mt-8">
+        <InputGroupInput
+          onChange={(e) => {
+            applyFilter(e.target.value)
+          }}
         />
+        <InputGroupAddon align="inline-start">
+          <Search />
+        </InputGroupAddon>
+      </InputGroup>
+      <div style={{ direction: "rtl" }}>
+        <Table className="w-full sm:max-w-lg mx-auto mt-8">
+          <TableHeader>
+            {table.getHeaderGroups().map((group) => (
+              <TableRow key={group.id}>
+                {group.headers.map((header) => (
+                  <TableHead key={header.id} className="text-start">
+                    {header.isPlaceholder ? null : (
+                      <div
+                        className={cn(
+                          {
+                            "cursor-pointer": header.column.getCanSort(),
+                          },
+                          "select-none",
+                        )}
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                        {{
+                          asc: " 🔼",
+                          desc: " 🔽",
+                        }[header.column.getIsSorted() as string] ?? null}
+                      </div>
+                    )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id} className="font-medium">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <div style={{ direction: "ltr" }} className="my-4">
+          <Paginator
+            totalPages={table.getPageCount()}
+            onChange={(page) => table.setPageIndex(page - 1)}
+          />
+        </div>
       </div>
-    </div>
+    </>
   )
 }
