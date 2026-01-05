@@ -7,8 +7,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { db } from "@/db"
+import { allocations, orders, purchases } from "@/db/schema"
 import { numberFormat } from "@/lib/utils"
+import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
+import { createServerFn } from "@tanstack/react-start"
 import {
   createColumnHelper,
   flexRender,
@@ -17,10 +21,31 @@ import {
 } from "@tanstack/react-table"
 
 import { format } from "date-fns-jalali"
+import { eq, sql } from "drizzle-orm"
 
 export const Route = createFileRoute("/dashboard/sellhistory")({
   component: RouteComponent,
 })
+
+const getSalesHistory = createServerFn().handler(async () => {
+  const result = db
+    .select({
+      id: orders.id,
+      cardId: purchases.cardId,
+      orderedAt: sql<number>`ordered_at*1000`,
+      quantity: orders.quantity,
+      price: orders.price,
+      preparationPrice: orders.preparationPrice,
+    })
+    .from(orders)
+    .innerJoin(allocations, eq(orders.id, allocations.id))
+    .innerJoin(purchases, eq(allocations.purchaseId, purchases.id))
+    .groupBy(orders.id)
+    .all()
+
+  return result //result.map((e) => ({ ...e, orderedAt: e.orderedAt.getTime() }))
+})
+
 type Order = {
   id: number
   cardId: string
@@ -57,20 +82,15 @@ const columns = [
     },
   }),
 ]
-const data = [
-  {
-    id: 1,
-    cardId: "H1230",
-    orderedAt: 1767599548625,
-    preparationPrice: 300000,
-    price: 8400,
-    quantity: 150,
-  },
-] as Array<Order>
+
 function RouteComponent() {
+  const { data } = useQuery({
+    queryKey: ["salehistory"],
+    queryFn: getSalesHistory,
+  })
   const table = useReactTable({
     columns,
-    data,
+    data: data || [],
     getCoreRowModel: getCoreRowModel(),
   })
   return (

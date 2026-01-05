@@ -25,17 +25,17 @@ export const allocations = sqliteTable("allocations", {
   allocatedAt: integer("allocated_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(unixepoch())`),
-  quantity: integer(),
-  sellingPrice: integer("selling_price"),
+  quantity: integer().notNull(),
+  sellingPrice: integer("selling_price").notNull(),
 })
 export const orders = sqliteTable("orders", {
   id: integer({ mode: "number" }).primaryKey({ autoIncrement: true }),
   orderedAt: integer("ordered_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(unixepoch())`),
-  quantity: integer(),
-  price: integer(),
-  preparationPrice: integer(),
+  quantity: integer().notNull(),
+  price: integer().notNull(),
+  preparationPrice: integer().notNull(),
 })
 
 export const user = sqliteTable("user", {
