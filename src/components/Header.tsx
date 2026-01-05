@@ -68,7 +68,7 @@ export default function Header() {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem>
-                <IconAddressBook /> Profile
+                <IconAddressBook /> پروفایل
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -81,7 +81,7 @@ export default function Header() {
                 }}
               >
                 <IconLogout />
-                Signout
+                خروج
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

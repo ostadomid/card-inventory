@@ -30,7 +30,7 @@ import { useQuery } from "@tanstack/react-query"
 import { createServerFn } from "@tanstack/react-start"
 import { db } from "@/db"
 import { purchases } from "@/db/schema"
-import { cn } from "@/lib/utils"
+import { cn, numberFormat } from "@/lib/utils"
 import { Paginator } from "@/components/Paginator"
 import { ActionCell } from "@/components/ActionCell"
 import { Field } from "@/components/ui/field"
@@ -51,8 +51,6 @@ type Purchase = {
   remaining: number
   imageKey: string
 }
-
-const numberFormat = (value: number) => Intl.NumberFormat("IR-fa").format(value)
 
 const hp = createColumnHelper<Purchase>()
 const columns = [
