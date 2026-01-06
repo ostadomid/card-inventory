@@ -1,3 +1,4 @@
+import { ActionCell } from "@/components/ActionCell"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Table,
@@ -56,7 +57,16 @@ type Order = {
 }
 const hp = createColumnHelper<Order>()
 const columns = [
-  hp.accessor("id", { header: "", enableHiding: true }),
+  hp.display({
+    id: "action",
+    cell: (props) => (
+      <ActionCell
+        id={props.row.original.id}
+        onDelete={(id) => Promise.resolve("Ok")}
+        onEdit={(id) => {}}
+      />
+    ),
+  }),
   hp.accessor("cardId", { header: "کد" }),
   hp.accessor("orderedAt", {
     header: "سفارش",

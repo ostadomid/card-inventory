@@ -64,7 +64,13 @@ export function ActionCell({ id, onDelete, onEdit }: Props) {
             >
               {deleting ? "در حال حذف کردن ..." : "حذف"}
             </Button>
-            <Button>انصراف</Button>
+            <Button
+              onClick={() => {
+                setOpen(false)
+              }}
+            >
+              انصراف
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
